@@ -1,18 +1,20 @@
+import { database } from './lib/database.js'
+
 let handler = async (m, { conn, who, prefix, isAdmin, isBotAdmin }) => {
     if (!who) return m.reply(`Menciona o responde a un usuario.\nEjemplo: *${prefix}mute @usuario*`)
     if (!isAdmin) return m.reply('👮 Solo administradores pueden usar este comando.')
     if (!isBotAdmin) return m.reply('🤖 Necesito ser admin para esto.')
 
-    if (!global.db.data.groups) global.db.data.groups = {}
-    if (!global.db.data.groups[m.chat]) global.db.data.groups[m.chat] = {}
-    if (!global.db.data.groups[m.chat].muted) global.db.data.groups[m.chat].muted = []
+    if (!database.data.groups) database.data.groups = {}
+    if (!database.data.groups[m.chat]) database.data.groups[m.chat] = {}
+    if (!database.data.groups[m.chat].muted) database.data.groups[m.chat].muted = []
 
-    const muted = global.db.data.groups[m.chat].muted
+    const muted = database.data.groups[m.chat].muted
 
     if (muted.includes(who)) return m.reply('Este usuario ya está muteado.')
 
     muted.push(who)
-    await global.db.save()
+    await database.save()
 
     await conn.sendMessage(m.chat, {
         text: `🔇 @${who.split('@')[0]} ha sido muteado.`,
