@@ -26,12 +26,13 @@ let handler = async (m, { conn, args }) => {
 
     try {
         const json = await fetchTikTokData(url)
-        if (!json.data?.video) throw new Error('No se encontró video')
+        if (!json.data?.download?.url) throw new Error('No se encontró video')
 
-        const videoBuffer = await downloadVideo(json.data.video)
+        const videoBuffer = await downloadVideo(json.data.download.url)
         const caption = `💞 *¡TikTok descargado con éxito darling!* 🌸\n\n` +
-                        `✨ *Autor:* ${json.data.author?.nickname || 'TikTok'}\n` +
-                        `📝 *Título:* ${json.data.title || 'Sin descripción'}\n\n` +
+                        `✨ *Autor:* ${json.data.autor || 'TikTok'}\n` +
+                        `📝 *Título:* ${json.data.titulo || 'Sin descripción'}\n` +
+                        `👁️ *Vistas:* ${json.data.vistas?.toLocaleString() || '?'} | ❤️ ${json.data.likes?.toLocaleString() || '?'}\n\n` +
                         `¡Disfrútalo mi amor~ 💗 No me dejes sola sin ver el video!`
 
         await conn.sendMessage(m.chat, { video: videoBuffer, caption }, { quoted: m })
