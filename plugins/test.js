@@ -1,1 +1,0 @@
-let handler = async (m, { conn }) => { await conn.sendMessage(m.chat, { text: '✅ bot activo' }, { quoted: m }) } handler.command = ['ping', 'test'] handler.tags = ['test'] export default handler
