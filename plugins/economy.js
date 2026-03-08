@@ -21,11 +21,13 @@ let handler = async (m, { command }) => {
         saveCoins()
     }
 
+    const moneda = global.moneda || 'monedas'   // ← Usa la global del settings
+
     await m.react('🍬')
 
     // #saldo
     if (command === 'saldo' || command === 'bal' || command === 'dinero') {
-        return m.reply(`💗 *¡Tu saldo actual darling!* 🌸\n\n💰 *Monedas:* ${coins[userId].balance}`)
+        return m.reply(`💗 *¡Tu saldo actual darling!* 🌸\n\n💰 *${moneda}:* ${coins[userId].balance}`)
     }
 
     // #chamba troll
@@ -39,7 +41,7 @@ let handler = async (m, { command }) => {
         coins[userId].lastChamba = Date.now()
         saveCoins()
 
-        return m.reply(`💗 *¡CHAMBA COMPLETADA DARLING!* 🌸\n\nLe chupas el pene a los creadores de la bot y ganas *${ganancia} monedas* 😂\n¡Zero Two aprueba este método troll! 💕\n\nSaldo actual: ${coins[userId].balance}`)
+        return m.reply(`💗 *¡CHAMBA COMPLETADA DARLING!* 🌸\n\nLe chupas el pene a los creadores de la bot y ganas *${ganancia} ${moneda}* 😂\n¡Zero Two aprueba este método troll! 💕\n\nSaldo actual: ${coins[userId].balance} ${moneda}`)
     }
 }
 
