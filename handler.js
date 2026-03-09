@@ -241,6 +241,7 @@ export const handler = async (m, conn, plugins) => {
             await database.save();
         }
 
+        // Resolución who con soporte LID → JID real
         let who = null;
 
         if (m.mentionedJid && m.mentionedJid[0]) {
@@ -250,7 +251,27 @@ export const handler = async (m, conn, plugins) => {
         }
 
         if (who) {
-            who = who.split('@')[0].split(':')[0] + '@s.whatsapp.net';
+            const rawNum = who.split('@')[0].split(':')[0]
+            const isLid = who.endsWith('@lid') || rawNum.length > 13
+
+            if (isLid && m.isGroup) {
+                try {
+                    const groupMeta = await conn.groupMetadata(m.chat)
+                    const found = groupMeta.participants.find(p =>
+                        p.lid?.includes(rawNum) || p.id?.includes(rawNum)
+                    )
+                    if (found) {
+                        who = found.jid || found.id || found.lid
+                        if (who.includes(':')) who = who.split(':')[0] + '@s.whatsapp.net'
+                    } else {
+                        who = rawNum + '@s.whatsapp.net'
+                    }
+                } catch {
+                    who = rawNum + '@s.whatsapp.net'
+                }
+            } else {
+                who = rawNum + '@s.whatsapp.net'
+            }
         }
 
         if (database.data.users[m.sender]?.banned && !isOwner) {
