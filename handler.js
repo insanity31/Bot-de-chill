@@ -257,17 +257,19 @@ export const handler = async (m, conn, plugins) => {
             if (isLid && m.isGroup) {
                 try {
                     const groupMeta = await conn.groupMetadata(m.chat)
+                    // Buscar si algún participante tiene jid @s.whatsapp.net con este lid
                     const found = groupMeta.participants.find(p =>
-                        p.lid?.includes(rawNum) || p.id?.includes(rawNum)
+                        p.lid?.split('@')[0] === rawNum || p.id?.split('@')[0] === rawNum
                     )
-                    if (found) {
-                        who = found.jid || found.id || found.lid
-                        if (who.includes(':')) who = who.split(':')[0] + '@s.whatsapp.net'
+                    if (found?.jid && found.jid.endsWith('@s.whatsapp.net')) {
+                        who = found.jid.includes(':') ? found.jid.split(':')[0] + '@s.whatsapp.net' : found.jid
+                    } else if (found?.id && found.id.endsWith('@s.whatsapp.net')) {
+                        who = found.id
                     } else {
-                        who = rawNum + '@s.whatsapp.net'
+                        who = rawNum + '@lid'
                     }
                 } catch {
-                    who = rawNum + '@s.whatsapp.net'
+                    who = rawNum + '@lid'
                 }
             } else {
                 who = rawNum + '@s.whatsapp.net'
