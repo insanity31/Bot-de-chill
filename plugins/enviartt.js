@@ -1,57 +1,63 @@
 import fetch from 'node-fetch'
 
-const API_KEY  = 'causa-ec43262f206b3305'
-const API_BASE = 'https://rest.apicausas.xyz/api/v1/descargas/tiktok'
+// Tu configuración
+const LINK_CANAL = 'https://whatsapp.com/channel/0029Vb6p68rF6smrH4Jeay3Y'
+const API_KEY = 'causa-ec43262f206b3305'
 
 let handler = async (m, { conn, args }) => {
     let url = args[0] || (m.quoted && m.quoted.text ? m.quoted.text.trim() : '')
     
     if (!url || !url.includes('tiktok.com')) {
-        await m.react('🌸')
-        return m.reply('💗 Pega el link de TikTok después del comando darling~\nEjemplo: *#enviartt https://vt.tiktok.com/...*')
+        return m.reply('💗 *Darling, necesito un link de TikTok.*\n\nEjemplo: `#enviartt https://vt.tiktok.com/...` o responde a un link con el comando.')
     }
 
-    await m.react('🍬')
+    await m.react('⏳')
 
     try {
-        // CORRECCIÓN 1: Sintaxis arreglada (${} en lugar de \( {} )
-        const res  = await fetch(`${API_BASE}?url=${encodeURIComponent(url)}&apikey=${API_KEY}`)
-        const json = await res.json()
-
-        if (!json.status || !json.data?.download?.url) {
-            throw new Error('La API no devolvió la URL del video. Verifica la API Key o el link.')
-        }
-
-        // Descargamos el buffer del video
-        const videoRes = await fetch(json.data.download.url)
-        const videoBuffer = await videoRes.buffer() // Nota: Si usas node-fetch v3, cambia esto por Buffer.from(await videoRes.arrayBuffer())
-
-        // TU CANAL OFICIAL
-        const CANAL = '0029Vb6p68rF6smrH4Jeay3Y@newsletter'
-
-        // CORRECCIÓN 2: Se añade mimetype explícito, necesario muchas veces para Canales
-        await conn.sendMessage(CANAL, {
-            video: videoBuffer,
-            mimetype: 'video/mp4',
-            caption: `💗 *TikTok enviado por ${m.pushName}*\n\n` +
-                     `✨ Autor: ${json.data.autor || 'TikTok'}\n` +
-                     `📝 Título: ${json.data.titulo || 'Sin descripción'}`
+        // 1. Obtener el ID REAL del canal usando el link (AUTOMÁTICO)
+        let inviteCode = LINK_CANAL.split('/').pop()
+        let metadata = await conn.newsletterMetadata("invite", inviteCode).catch(e => {
+            console.error("Error al obtener metadata:", e)
+            return null
         })
 
-        await m.reply('✅ Video enviado correctamente a tu canal oficial darling~ 💕')
-        await m.react('💗')
+        if (!metadata || !metadata.id) {
+            throw 'No pude encontrar el ID del canal. Asegúrate de que el bot sea administrador.'
+        }
+
+        const JID_CANAL = metadata.id // Aquí ya tenemos el 120363...
+
+        // 2. Descargar el video de TikTok
+        const res = await fetch(`https://rest.apicausas.xyz/api/v1/descargas/tiktok?url=${encodeURIComponent(url)}&apikey=${API_KEY}`)
+        const json = await res.json()
+
+        if (!json.status) throw 'La API de TikTok no respondió correctamente.'
+
+        const videoUrl = json.data.download.url
+        const videoRes = await fetch(videoUrl)
+        const buffer = await videoRes.buffer()
+
+        // 3. Enviar al canal oficial
+        await conn.sendMessage(JID_CANAL, {
+            video: buffer,
+            caption: `💗 *TikTok de:* ${json.data.autor}\n📝 ${json.data.titulo}\n\n✨ _Enviado por Zero Two Bot_`,
+            mimetype: 'video/mp4',
+            fileName: `video.mp4`
+        })
+
+        await m.react('✅')
+        await m.reply(`✨ ¡Video enviado con éxito al canal:\n*${metadata.name}*!`)
 
     } catch (e) {
-        console.error('ENVIARTT ERROR:', e)
-        await m.react('💔')
-        // Ahora el bot te dirá el error exacto en el chat para que sea más fácil debugear
-        m.reply(`💔 Uy darling... hubo un error:\n_${e.message}_\nPrueba con otro TikTok o revisa la consola.`)
+        console.error(e)
+        await m.react('❌')
+        m.reply(`💔 *Error:* ${e.message || e}\n\n_Revisa que la Bot sea Administradora en el canal._`)
     }
 }
 
 handler.help = ['enviartt <link>']
-handler.tags = ['descargas']
-handler.command = ['enviartt', 'ttsend', 'enviartiktok']
+handler.tags = ['owner']
+handler.command = ['enviartt', 'sendtt']
 handler.owner = true
 
 export default handler
