@@ -5,28 +5,22 @@ let handler = async (m, { conn, args }) => {
     
     if (!url || !url.includes('tiktok.com')) {
         await m.react('🌸')
-        return m.reply('💗 Pega el link de TikTok después del comando darling\~\nEjemplo: *#enviartt https://vm.tiktok.com/...*')
+        return m.reply('💗 Pega el link de TikTok después del comando darling\~\nEjemplo: *#enviartt https://vt.tiktok.com/...*')
     }
 
     await m.react('🍬')
 
     try {
-        // Primera petición a tu API
-        const apiUrl = `https://rest.apicausas.xyz/api/tiktok?url=${encodeURIComponent(url)}`
+        const apiUrl = `https://api.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`
         const res = await fetch(apiUrl)
         const json = await res.json()
 
-        if (!json.data?.video) {
-            throw new Error('La API no devolvió video')
+        if (json.code !== 0 || !json.data?.video) {
+            throw new Error('No se pudo obtener el video')
         }
 
         const videoUrl = json.data.video
-
-        // Descarga del video con timeout
-        const videoRes = await fetch(videoUrl, { timeout: 15000 })
-        if (!videoRes.ok) throw new Error('Error al descargar el video')
-
-        const videoBuffer = await videoRes.buffer()
+        const videoBuffer = await fetch(videoUrl).then(r => r.buffer())
 
         // TU CANAL OFICIAL
         const CANAL = '0029Vb6p68rF6smrH4Jeay3Y@newsletter'
@@ -42,9 +36,7 @@ let handler = async (m, { conn, args }) => {
     } catch (e) {
         console.error('ENVIARTT ERROR:', e.message || e)
         await m.react('💔')
-        m.reply('💔 Uy darling... no pude enviar el video esta vez\~\n' +
-                `Error: ${e.message || 'Desconocido'}\n` +
-                'Prueba con otro link o avísame si sigue fallando')
+        m.reply('💔 Uy darling... este link no funcionó esta vez\~\nPrueba con otro link o avísame')
     }
 }
 
