@@ -1,43 +1,36 @@
 let handler = m => {
     if (!m.isGroup) return true
-    if (m.isAdmin || m.isOwner) return true  // Admins y owner inmunes
+    if (m.isAdmin || m.isOwner) return true
 
-    let user = global.db.data.users[m.sender]
-    if (!user) {
-        global.db.data.users[m.sender] = { toxicWarn: 0 }
-        user = global.db.data.users[m.sender]
-    }
+    let user = global.db.data.users[m.sender] || (global.db.data.users[m.sender] = { toxicWarn: 0 })
 
-    const toxicWords = [
-        'puta', 'puto', 'mierda', 'joder', 'carajo', 'pendejo', 'gilipollas',
-        'cabron', 'zorra', 'verga', 'coño', 'culo', 'huevos', 'mamahuevo',
-        'maricon', 'maricón', 'cabrón', 'hijo de puta', 'hdp', 'pajero',
-        'pajera', 'estupido', 'estúpido', 'idiota', 'imbecil', 'imbécil'
-    ]
+    const toxicWords = ['puta', 'puto', 'mierda', 'joder', 'pendejo', 'gilipollas', 'cabron', 'zorra', 'verga', 'coño', 'culo', 'maricon', 'hdp', 'hijo de puta']
 
     const texto = m.text.toLowerCase()
-    const esToxic = toxicWords.some(palabra => texto.includes(palabra))
 
-    if (esToxic) {
+    if (toxicWords.some(word => texto.includes(word))) {
+        console.log(`[ANTI-TOXIC] Detectado en ${m.sender}`) // ← para que veas en consola si funciona
+
         user.toxicWarn = (user.toxicWarn || 0) + 1
 
+        // Borra el mensaje tóxico siempre
+        conn.sendMessage(m.chat, { delete: m.key })
+
         if (user.toxicWarn === 1) {
-            m.reply(`💔 *¡Primera advertencia darling!* 🌸\nNo uses palabras tóxicas o te voy a tener que sacar\~`)
+            m.reply(`⚠️ *Primera advertencia darling!* 🌸\nNo uses palabras tóxicas o te saco del grupo.`)
             m.react('⚠️')
         } 
         else if (user.toxicWarn === 2) {
-            m.reply(`💔 *¡Segunda advertencia darling!* 🌸\nYa van dos... la próxima te echo del grupo, no me hagas enojar\~`)
+            m.reply(`⚠️ *¡Segunda advertencia!* 🌸\nYa van dos... la próxima te echo sin piedad.`)
             m.react('⚠️')
         } 
         else if (user.toxicWarn >= 3) {
-            m.reply(`💔 *¡TERCERA ADVERTENCIA!* 🌸\nLo siento darling, pero llegaste al límite... te tengo que sacar del grupo.`)
-
+            m.reply(`💥 *¡TERCERA Y ÚLTIMA ADVERTENCIA!* 💔\nLo siento darling, pero te tengo que sacar del grupo.`)
             conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
-            user.toxicWarn = 0  // Reinicia el contador
+            user.toxicWarn = 0
             m.react('💥')
         }
     }
-
     return true
 }
 
