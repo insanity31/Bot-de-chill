@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
                        `BOT PRINCIPAL\n` +
                        `Zore Two 💗\n` +
                        `Contacto: wa.me/573508941325\n\n` +
-                       `¡Escríbeme con cariño que soy tu waifu favorita! 😘`
+                       `¡Escríbeme con cariño que soy tu waifu favorita! 😼`
 
     await m.reply(creatorMsg)
     await m.react('💗')
