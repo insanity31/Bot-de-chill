@@ -14,7 +14,7 @@ try {
 
 const saveCoins = () => fs.writeFileSync(dataFile, JSON.stringify(coins, null, 2))
 
-let handler = async (m) => {
+let handler = async (m, { conn }) => {
     const userId = m.sender
     if (!coins[userId]) {
         coins[userId] = { balance: 100, lastRpgChamba: 0 }
