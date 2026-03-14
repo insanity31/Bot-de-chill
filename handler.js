@@ -341,66 +341,84 @@ export const handler = async (m, conn, plugins) => {
 
 } catch (cmdError) {
 
-    console.log(chalk.red('[ERROR COMANDO DETECTADO]'), cmdError);
+    console.log(chalk.red('[ERROR COMANDO DETECTADO]'));
+    console.log(cmdError);
 
     let errorType = 'Desconocido';
     let errorMsg = cmdError?.message || String(cmdError);
 
-    if (cmdError?.response) {
-        errorType = 'API / HTTP';
-        errorMsg = `Status: ${cmdError.response.status}\nData: ${JSON.stringify(cmdError.response.data).slice(0,300)}`;
+    try {
+
+        if (cmdError.response) {
+            errorType = 'API / HTTP';
+            errorMsg = `Status: ${cmdError.response.status}\nData: ${JSON.stringify(cmdError.response.data).slice(0,300)}`;
+        }
+
+        else if (errorMsg.includes('<html') || errorMsg.includes('<!DOCTYPE html')) {
+            errorType = 'Respuesta HTML inesperada (posible API caída)';
+        }
+
+        else if (errorMsg.includes('Unexpected token') || errorMsg.includes('JSON')) {
+            errorType = 'Error de JSON';
+        }
+
+        else if (errorMsg.includes('Cannot find module') || errorMsg.includes('ERR_MODULE_NOT_FOUND')) {
+            errorType = 'Error de Import / Módulo faltante';
+        }
+
+        else if (errorMsg.includes('SyntaxError')) {
+            errorType = 'Error de Sintaxis';
+        }
+
+        else if (errorMsg.includes('ECONNREFUSED') || errorMsg.includes('ENOTFOUND')) {
+            errorType = 'Error de conexión / API caída';
+        }
+
+        else if (errorMsg.includes('timeout')) {
+            errorType = 'Timeout / API muy lenta';
+        }
+
+        else if (errorMsg.includes('ENOENT')) {
+            errorType = 'Archivo no encontrado (FS)';
+        }
+
+    } catch (detectError) {
+        console.log(chalk.yellow('[ERROR AL ANALIZAR ERROR]'), detectError);
     }
 
-    else if (errorMsg.includes('<html') || errorMsg.includes('<!DOCTYPE html')) {
-        errorType = 'Respuesta HTML inesperada (API caída)';
-    }
-
-    else if (errorMsg.includes('Unexpected token') || errorMsg.includes('JSON')) {
-        errorType = 'Error de JSON';
-    }
-
-    else if (errorMsg.includes('Cannot find module') || errorMsg.includes('ERR_MODULE_NOT_FOUND')) {
-        errorType = 'Error de Import';
-    }
-
-    else if (errorMsg.includes('SyntaxError')) {
-        errorType = 'Error de Sintaxis';
-    }
-
-    else if (errorMsg.includes('ECONNREFUSED') || errorMsg.includes('ENOTFOUND')) {
-        errorType = 'Error de conexión';
-    }
-
-    else if (errorMsg.includes('timeout')) {
-        errorType = 'Timeout de API';
-    }
-
-    else if (errorMsg.includes('ENOENT')) {
-        errorType = 'Archivo no encontrado';
-    }
-
-    const debug = `
+    let debug = `
 ❌ *ERROR AL EJECUTAR COMANDO*
 
 📌 Tipo: ${errorType}
 
 🧾 Mensaje:
-${errorMsg.slice(0,400)}
+${errorMsg.slice(0,500)}
 
 ⚙️ Comando:
 ${m.text}
+
 `.trim();
 
     console.log(chalk.red(debug));
 
-    if (isOwner) m.reply(debug);
-    else m.reply('❌ Ocurrió un error al ejecutar el comando.');
+    m.reply(debug);
 
 }
 
 } catch (e) {
 
     console.log(chalk.red('[ERROR HANDLER GLOBAL]'), e);
+
+    let msg = e?.message || String(e);
+
+    if (m?.reply) {
+        m.reply(`❌ *ERROR GLOBAL*
+
+🧾 ${msg.slice(0,400)}
+`);
+    } else {
+        console.log(msg);
+    }
 
 }
 }
