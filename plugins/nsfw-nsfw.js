@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-const hotw = '⚠️ El contenido NSFW está desactivado en este grupo.\n> Ve a jalartela a otro lado 😡';
-const dev = '> No te la jales 😏';
+import { database } from '../lib/database.js'
 
 const API_MAP = {
   'neko': 'https://api.waifu.pics/nsfw/neko',
@@ -22,58 +20,34 @@ const API_MAP = {
   '4k': 'https://nekobot.xyz/api/image?type=4k'
 };
 
-const NSFW_COMMANDS = Object.keys(API_MAP);
-
 let handler = async (m, { conn, command }) => {
+  if (!database.data.groups?.[m.chat]?.nsfw) {
+    return m.reply('🚫 El contenido NSFW está desactivado.\n> Ve a jalartela a otro lado 😡');
+  }
+
+  const apiUrl = API_MAP[command];
+  if (!apiUrl) return;
+
   try {
-    if (!global.db.data.chats[m.chat].nsfw && m.isGroup) {
-      return m.reply(hotw);
-    }
-
-    const apiUrl = API_MAP[command];
-    if (!apiUrl) return;
-
+    await m.react('🕑');
     const { data } = await axios.get(apiUrl);
-    const imageUrl = data.url || data.message || (data.images && data.images[0].url);
+    const imageUrl = data.url || data.message || (data.images && data.images[0]?.url);
 
-    if (!imageUrl) throw 'Error';
+    if (!imageUrl) throw new Error();
 
     await conn.sendMessage(m.chat, {
       image: { url: imageUrl },
-      caption: `🥵 ${command}`,
-      footer: dev,
-      buttons: [
-        { buttonId: `next_${command}`, buttonText: { displayText: 'Siguiente' }, type: 1 }
-      ],
-      headerType: 4
+      caption: `🥵 *${command.toUpperCase()}*\n> No te la jales 😏`
     }, { quoted: m });
 
-  } catch (err) {
+    await m.react('✅');
+  } catch {
+    await m.react('✖️');
     m.reply('❌ Error al obtener contenido.');
   }
 };
 
-handler.before = async (m, { conn }) => {
-  const id = m.message?.buttonsResponseMessage?.selectedButtonId;
-  if (!id) return;
-
-  try {
-    const [action, command] = id.split('_'); 
-    if (action === 'next' && API_MAP[command]) {
-      const { data } = await axios.get(API_MAP[command]);
-      const imageUrl = data.url || data.message || (data.images && data.images[0].url);
-      await conn.sendMessage(m.chat, {
-        image: { url: imageUrl },
-        caption: `🥵 ${command}`,
-        footer: dev,
-        buttons: [{ buttonId: `next_${command}`, buttonText: { displayText: 'Siguiente' }, type: 1 }],
-        headerType: 4
-      }, { quoted: m });
-    }
-  } catch (err) {}
-};
-
-handler.help = handler.command = NSFW_COMMANDS;
+handler.help = handler.command = Object.keys(API_MAP);
 handler.tags = ['nsfw'];
 handler.group = true;
 
