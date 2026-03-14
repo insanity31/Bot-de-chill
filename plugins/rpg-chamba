@@ -4,18 +4,35 @@ import path from 'path'
 const dataDir = './database'
 const dataFile = path.join(dataDir, 'coins.json')
 
+// SOLUCIÓN 1: Crear la carpeta si no existe para evitar el error "ENOENT"
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+}
+
 let coins = {}
 try {
     if (fs.existsSync(dataFile)) {
         const data = fs.readFileSync(dataFile, 'utf8').trim()
         if (data) coins = JSON.parse(data)
     }
-} catch (e) {}
+} catch (e) {
+    console.error('⚠️ Error leyendo coins.json. Se iniciará una base de datos limpia.', e)
+}
 
-const saveCoins = () => fs.writeFileSync(dataFile, JSON.stringify(coins, null, 2))
+// SOLUCIÓN 2: Añadir un bloque try-catch al guardado para evitar crasheos en tiempo de ejecución
+const saveCoins = () => {
+    try {
+        fs.writeFileSync(dataFile, JSON.stringify(coins, null, 2))
+    } catch (error) {
+        console.error('⚠️ Error guardando el archivo coins.json:', error)
+    }
+}
 
 let handler = async (m) => {
     const userId = m.sender
+    if (!userId) return // Seguridad extra por si el mensaje viene mal formado
+
+    // Inicializar usuario si no existe
     if (!coins[userId]) {
         coins[userId] = { balance: 100, lastRpgChamba: 0 }
         saveCoins()
@@ -23,18 +40,26 @@ let handler = async (m) => {
 
     const moneda = global.moneda || 'monedas'
 
-    await m.react('🍬')
+    // SOLUCIÓN 3: Proteger la reacción. Si falla por permisos, el código sigue funcionando.
+    try {
+        await m.react('🍬')
+    } catch (e) {}
 
-    // Cooldown 15 minutos
-    if (Date.now() - (coins[userId].lastRpgChamba || 0) < 900000) {
-        const tiempo = Math.ceil((900000 - (Date.now() - coins[userId].lastRpgChamba)) / 60000)
-        return m.reply(`💔 Ya hiciste tu quest RPG hoy darling\~\nVuelve en *${tiempo} minutos* no me dejes sola\~`)
+    const timeNow = Date.now()
+    const timeLast = coins[userId].lastRpgChamba || 0
+    const cooldown = 900000 // 15 minutos en milisegundos
+
+    // Verificar Cooldown
+    if (timeNow - timeLast < cooldown) {
+        const tiempoRestante = Math.ceil((cooldown - (timeNow - timeLast)) / 60000)
+        return m.reply(`💔 Ya hiciste tu quest RPG hoy darling~\nVuelve en *${tiempoRestante} minutos* no me dejes sola~`)
     }
 
+    // Lógica de recompensa
     const ganancia = 180
     coins[userId].balance += ganancia
-    coins[userId].lastRpgChamba = Date.now()
-    saveCoins()
+    coins[userId].lastRpgChamba = timeNow
+    saveCoins() // Guardar inmediatamente
 
     const trollText = `💗 *¡QUEST RPG-CHAMBA COMPLETADA DARLING!* 🌸\n\n` +
                      `Entraste a la mazmorra a matar slimes... pero terminaste chupándosela al Slime Rey durante 3 horas seguidas y te dio *${ganancia} ${moneda}* como recompensa 😂\n\n` +
