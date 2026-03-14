@@ -31,7 +31,15 @@ let handler = async (m, { conn, command }) => {
   try {
     await m.react('🕑');
     const { data } = await axios.get(apiUrl);
-    const imageUrl = data.url || data.message || (data.images && data.images[0]?.url);
+    
+    let imageUrl;
+    if (data.images && Array.isArray(data.images)) {
+      imageUrl = data.images[0].url;
+    } else if (data.message) {
+      imageUrl = data.message;
+    } else if (data.url) {
+      imageUrl = data.url;
+    }
 
     if (!imageUrl) throw new Error();
 
