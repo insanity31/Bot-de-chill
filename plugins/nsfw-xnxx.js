@@ -1,10 +1,10 @@
 import fetch from 'node-fetch'
 import cheerio from 'cheerio'
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
+let handler = async (m, { args, usedPrefix, command }) => {
     if (!global.db.data.chats[m.chat].nsfw) {
         await m.react('💔')
-        return m.reply(`ꕥ El contenido *NSFW* está desactivado en este grupo.\n\nUn *administrador* puede activarlo con:\n» *${usedPrefix}nsfw on*`)
+        return m.reply(`ꕥ El contenido *NSFW* está desactivado en este grupo.\n\nUn *administrador* puede activarlo con:\n» *${usedPrefix}nable nsfw on*`)
     }
 
     await m.react('🍬')
@@ -57,7 +57,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         await m.react('💗')
 
     } catch (e) {
-        console.error(e)
+        console.error('XNXX ERROR:', e.message || e)
         await m.react('💔')
         m.reply(`💔 Uy darling... algo salió mal\~\nError: ${e.message || 'Desconocido'}`)
     }
@@ -65,10 +65,11 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 async function xnxxdl(URL) {
     const res = await fetch(URL)
-    const $ = cheerio.load(await res.text())
+    const html = await res.text()
+    const $ = cheerio.load(html)
+
     const title = $('meta[property="og:title"]').attr("content") || $('title').text().trim()
     const image = $('meta[property="og:image"]').attr("content")
-    const info = $("span.metadata").text() || ""
 
     let files = {}
     const scripts = $('script').filter((i, el) => $(el).html()?.includes('html5player'))
@@ -80,19 +81,18 @@ async function xnxxdl(URL) {
     if (lowMatch) files.low = lowMatch[1]
     if (highMatch) files.high = highMatch[1]
 
-    return { result: { title, image, info: parseInfo(info), files } }
-}
+    let info = $("span.metadata").text() || ""
+    let dur = info.match(/(\d+\s?min)/i)?.[0] || 'Desconocida'
+    let qual = info.match(/([0-9]{3,4}p)/i)?.[0] || 'Desconocida'
+    let views = info.match(/([0-9.,]+)\s*(views|vistas)/i)?.[1]?.replace(/[.,]/g, '') || 'Desconocidas'
 
-function parseInfo(infoStr) {
-    let dur = infoStr.match(/(\d+\s?min)/i)?.[0] || 'Desconocida'
-    let qual = infoStr.match(/([0-9]{3,4}p)/i)?.[0] || 'Desconocida'
-    let views = infoStr.match(/([0-9.,]+)\s*(views|vistas)/i)?.[1]?.replace(/[.,]/g, '') || 'Desconocidas'
-    return { dur, qual, views }
+    return { result: { title, image, info: { dur, qual, views }, files } }
 }
 
 async function search(query) {
     const res = await fetch(`https://www.xnxx.com/search/\( {query}/ \){Math.floor(Math.random() * 3) + 1}`)
-    const $ = cheerio.load(await res.text())
+    const html = await res.text()
+    const $ = cheerio.load(html)
     const results = []
 
     $('div.mozaique div.thumb-under').each((i, el) => {
