@@ -1,31 +1,35 @@
 let handler = async (m, { conn }) => {
-    // Validamos que el usuario esté respondiendo a un mensaje
+    // 1. Verificamos que esté respondiendo a algo
     if (!m.quoted) {
         await m.react('⚠️')
-        return m.reply('Bro, tienes que responder al mensaje (texto, imagen, audio o video) que quieres guardar.')
+        return m.reply('💗 Darling~ tienes que responder al mensaje que quieres guardar para que te lo mande al privado.')
     }
 
     await m.react('📦')
 
     try {
-        // Obtenemos el objeto del mensaje citado para poder reenviarlo
-        let msgToSave = await m.getQuotedObj()
+        // 2. Obtenemos el ID del chat privado del usuario
+        let userJid = m.sender
+
+        // 3. Reenviamos el mensaje citado (m.quoted.fakeObj es el estándar más compatible)
+        await conn.copyNForward(userJid, m.quoted.fakeObj, true)
         
-        // El bot reenvía el mensaje al DM del usuario (m.sender)
-        await conn.copyNForward(m.sender, msgToSave, false)
-        
-        // Le avisamos en el grupo que ya se lo mandamos
-        await m.reply('✅ ¡Listo bro! Te acabo de enviar este mensaje a nuestro chat privado para que no se te pierda. 📩')
-        
+        // 4. Confirmación visual
+        await m.reply('✅ ¡Listo mi amor! Ya te lo envié al privado. Revisa nuestro chat~ 🌸')
+        await m.react('🍬')
+
     } catch (e) {
-        console.error(e)
-        await m.react('❌')
-        m.reply('Uy, no pude enviártelo al privado. 😅\n\n*Nota:* Si nunca me has hablado por privado, mándame un "Hola" primero para que WhatsApp me deje enviarte mensajes.')
+        console.error("Error en el comando save:", e)
+        await m.react('💔')
+        
+        // Error común: el usuario no ha iniciado chat con el bot
+        m.reply('💔 Uy darling... no pude enviártelo. Asegúrate de haberme enviado al menos un "Hola" al privado para que WhatsApp me deje hablarte.')
     }
 }
 
 handler.help = ['save', 'guardar']
 handler.tags = ['utilidad']
 handler.command = ['save', 'guardar', 'priv']
+handler.group = true // Solo tiene sentido usarlo en grupos
 
 export default handler
