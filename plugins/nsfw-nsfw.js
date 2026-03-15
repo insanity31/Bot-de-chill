@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 import { database } from '../lib/database.js'
 
 const API_MAP = {
@@ -18,45 +18,60 @@ const API_MAP = {
   'culo': 'https://nekobot.xyz/api/image?type=ass',
   'gonewild': 'https://nekobot.xyz/api/image?type=gonewild',
   '4k': 'https://nekobot.xyz/api/image?type=4k'
-};
+}
 
 let handler = async (m, { conn, command }) => {
-  if (!database.data.groups?.[m.chat]?.nsfw) {
-    return m.reply('🚫 El contenido NSFW está desactivado.\n> Ve a jalartela a otro lado 😡');
-  }
-
-  const apiUrl = API_MAP[command];
-  if (!apiUrl) return;
-
   try {
-    await m.react('🕑');
-    const { data } = await axios.get(apiUrl);
-    
-    let imageUrl;
-    if (data.images && Array.isArray(data.images)) {
-      imageUrl = data.images[0].url;
-    } else if (data.message) {
-      imageUrl = data.message;
-    } else if (data.url) {
-      imageUrl = data.url;
+
+    if (!database.data?.groups?.[m.chat]?.nsfw) {
+      return m.reply('🚫 El contenido NSFW está desactivado.\n> Ve a jalartela a otro lado 😡')
     }
 
-    if (!imageUrl) throw new Error();
+    const apiUrl = API_MAP[command]
+    if (!apiUrl) return
 
-    await conn.sendMessage(m.chat, {
-      image: { url: imageUrl },
-      caption: `🥵 *${command.toUpperCase()}*\n> No te la jales 😏`
-    }, { quoted: m });
+    await m.react('🕑')
 
-    await m.react('✅');
-  } catch {
-    await m.react('✖️');
-    m.reply('❌ Error al obtener contenido.');
+    const res = await axios.get(apiUrl)
+    const data = res.data
+
+    let imageUrl = null
+
+    if (data?.images?.length) {
+      imageUrl = data.images[0].url
+    }
+
+    if (!imageUrl && data?.url) {
+      imageUrl = data.url
+    }
+
+    if (!imageUrl && data?.message) {
+      imageUrl = data.message
+    }
+
+    if (!imageUrl) throw 'No image'
+
+    await conn.sendMessage(
+      m.chat,
+      {
+        image: { url: imageUrl },
+        caption: `🥵 *${command.toUpperCase()}*\n> No te la jales 😏`
+      },
+      { quoted: m }
+    )
+
+    await m.react('✅')
+
+  } catch (e) {
+    console.log(e)
+    await m.react('✖️')
+    m.reply('❌ Error al obtener contenido.')
   }
-};
+}
 
-handler.help = handler.command = Object.keys(API_MAP);
-handler.tags = ['nsfw'];
-handler.group = true;
+handler.help = Object.keys(API_MAP)
+handler.command = Object.keys(API_MAP)
+handler.tags = ['nsfw']
+handler.group = true
 
-export default handler;
+export default handler
