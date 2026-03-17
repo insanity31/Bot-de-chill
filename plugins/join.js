@@ -1,78 +1,71 @@
-let linkRegex = /(?:https?:\/\/)?(?:www\.)?chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})(?:\s+([0-9]{1,3}))?/i
+let linkRegex = /chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})(?:\s+(\d{1,3}))?/i
 
-const isNumber = (x) => {
-  x = parseInt(x)
-  return typeof x === 'number' && !isNaN(x)
-}
+const isNumber = (x) => !isNaN(parseInt(x))
 
-let handler = async (m, { conn, text, isOwner, usedPrefix, command }) => {
+let handler = async (m, { conn, text, isOwner }) => {
   try {
-    if (!text) return m.reply('☆ Ingresa el enlace del grupo. Ejemplo:\njoin https://chat.whatsapp.com/ABCD... 3')
+    if (!text) return m.reply('♡ Darling... necesito un enlace de grupo 💗')
 
-    // extrae código y opcional días
     let match = text.match(linkRegex)
-    if (!match) return m.reply('☆ Enlace inválido. Asegúrate de pegar un enlace de chat.whatsapp.com')
+    if (!match) return m.reply('♡ Ese enlace no es válido... intenta otra vez')
 
     let [, code, daysStr] = match
 
-    // calcular días
+    // 💗 Días configurables
     let days = 0
     if (isOwner) {
-      // owner: si pasa número, úsalo; si no lo pasa, days = 0 (sin expiración)
-      if (daysStr && isNumber(daysStr)) {
-        days = Math.min(999, Math.max(1, parseInt(daysStr)))
-      } else {
-        days = 0
-      }
+      days = daysStr && isNumber(daysStr)
+        ? Math.min(999, Math.max(1, parseInt(daysStr)))
+        : 0
     } else {
-      // no-owner: ignora lo que pase y fija 3 días por seguridad
       days = 3
     }
 
-    // intenta unirse
-    let res = await conn.groupAcceptInvite(code) // suele devolver groupId (ej: 12345-678@g.us)
-    if (!res) throw new Error('No se recibió ID del grupo al unirse.')
+    // 💌 Unirse al grupo
+    let groupId = await conn.groupAcceptInvite(code)
 
-    // intenta obtener metadata para nombre bonito (si la API lo soporta)
-    let groupName = ''
+    // 💗 Obtener nombre del grupo (sin romper si falla)
+    let groupName = groupId
     try {
-      let metadata = await conn.groupMetadata(res).catch(() => null)
-      groupName = metadata && metadata.subject ? metadata.subject : res
-    } catch (errMeta) {
-      groupName = res
-    }
+      let meta = await conn.groupMetadata(groupId)
+      if (meta?.subject) groupName = meta.subject
+    } catch {}
 
-    // guarda/crea entry en DB de chats
-    let chats = global.db && global.db.data && global.db.data.chats ? global.db.data.chats : (global.db.data = { chats: {} }) && global.db.data.chats
-    if (!chats[res]) chats[res] = {}
-    if (days && days > 0) {
-      chats[res].expired = Date.now() + days * 24 * 60 * 60 * 1000
+    // 💾 Asegurar DB
+    global.db = global.db || {}
+    global.db.data = global.db.data || {}
+    global.db.data.chats = global.db.data.chats || {}
+
+    let chats = global.db.data.chats
+    chats[groupId] = chats[groupId] || {}
+
+    if (days > 0) {
+      chats[groupId].expired = Date.now() + days * 86400000
     } else {
-      // si days === 0 dejamos que no expire (eliminamos la propiedad si existía)
-      if (chats[res].hasOwnProperty('expired')) delete chats[res].expired
+      delete chats[groupId].expired
     }
 
-    // mensaje de confirmación al usuario que pidió el join
-    await m.reply(`☆ Me uní correctamente al grupo *${groupName}*.\n☆ Expiración: ${days === 0 ? 'sin límite' : `${days} día(s)`}`)
+    // 💬 Confirmación
+    await m.reply(`♡ Me uní a *${groupName}*...\n♡ ${days ? `Estaré aquí por ${days} día(s) 💗` : 'Me quedaré contigo, Darling... 💗'}`)
 
-    // envia un mensaje de presentación en el grupo nuevo
-    let pp = 'https://files.catbox.moe/sjak3i.jpg' // banner/gif opcional
-    let welcomeText = `¡Hola! Ya llegué al grupo 👋\nSoy el bot — si necesitan ayuda, mencionen a mi creador o usen los comandos.`
-    await conn.sendMessage(res, {
-      video: { url: pp },
+    // 🎥 Mensaje al grupo estilo Zero Two
+    let media = 'https://files.catbox.moe/sjak3i.jpg'
+    let texto = `╭━━━〔 ♡ 𝒁𝒆𝒓𝒐 𝑻𝒘𝒐 ♡ 〕━━━⬣
+┃ ❥ Ya llegué, Darling... 💗
+┃ ❥ Espero que me trates bien~
+┃ ❥ Usa mis comandos si me necesitas
+╰━━━━━━━━━━━━━━━━⬣`
+
+    await conn.sendMessage(groupId, {
+      video: { url: media },
       gifPlayback: true,
-      caption: welcomeText,
+      caption: texto,
       mentions: [m.sender]
     }, { quoted: m })
 
-  } catch (err) {
-    console.error(err)
-    let errMsg = err && err.message ? err.message : String(err)
-    // mensajes amigables al usuario
-    if (/invite code/i.test(errMsg) || /invalid|invitation|expired/i.test(errMsg.toLowerCase())) {
-      return m.reply('✖ No pude unirme: el enlace parece inválido o expirado.')
-    }
-    m.reply('✖ Ocurrió un error al intentar unirme. Revisa la consola del bot para más detalles.')
+  } catch (e) {
+    console.error(e)
+    m.reply('♡ Mmm... algo salió mal Darling, intenta otra vez 💔')
   }
 }
 
