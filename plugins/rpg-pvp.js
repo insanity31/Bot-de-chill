@@ -1,36 +1,40 @@
 let handler = async (m, { conn, prefix, who, db }) => {
     conn.pvp = conn.pvp ? conn.pvp : {}
-    let opponent = who
     
-    if (!opponent || opponent === m.sender) {
-        return m.reply(`*⚔️ ¡DESAFÍO PVP! ⚔️*\n\nDebes etiquetar a alguien.\nEjemplo: *${prefix}pvp @user*`)
+    // 1. Verificación de objetivo
+    if (!who || who === m.sender) {
+        return m.reply(`*⚔️ ¡DESAFÍO PVP! ⚔️*\n\nDebes etiquetar a alguien o responder a su mensaje.\nEjemplo: *${prefix}pvp @user*`)
     }
 
-    // --- SOLUCIÓN AL ERROR: Inicialización forzada ---
+    // 2. INICIACIÓN FORZADA (Evita el error de 'undefined')
+    if (!db.users) db.users = {}
     if (!db.users[m.sender]) db.users[m.sender] = { coin: 0, exp: 0, limit: 20 }
-    if (!db.users[opponent]) db.users[opponent] = { coin: 0, exp: 0, limit: 20 }
+    if (!db.users[who]) db.users[who] = { coin: 0, exp: 0, limit: 20 }
 
-    // Aseguramos que la propiedad 'coin' exista en ambos
+    // Aseguramos que la propiedad coin exista (por si el usuario ya existía pero no tenía monedas)
     if (db.users[m.sender].coin === undefined) db.users[m.sender].coin = 0
-    if (db.users[opponent].coin === undefined) db.users[opponent].coin = 0
+    if (db.users[who].coin === undefined) db.users[who].coin = 0
 
     let apuesta = 200
 
+    // 3. Verificación de saldo
     if (db.users[m.sender].coin < apuesta) {
         return m.reply(`❌ No tienes suficientes monedas. Necesitas ${apuesta} y tienes ${db.users[m.sender].coin}.`)
     }
-    if (db.users[opponent].coin < apuesta) {
-        return m.reply(`❌ El oponente solo tiene ${db.users[opponent].coin} monedas. No puede apostar ${apuesta}.`)
+    if (db.users[who].coin < apuesta) {
+        return m.reply(`❌ El oponente (@${who.split('@')[0]}) no tiene suficientes monedas para apostar.`, null, { mentions: [who] })
     }
 
     if (conn.pvp[m.chat] && Object.values(conn.pvp[m.chat]).some(g => g.p1 === m.sender || g.p2 === m.sender)) {
-        return m.reply('⚠️ Ya tienes un duelo pendiente.')
+        return m.reply('⚠️ Ya tienes un duelo pendiente en este grupo.')
     }
 
-    let gameId = m.sender + '-' + opponent
+    let gameId = m.sender + '-' + who
+    conn.pvp[m.chat] = conn.pvp[m.chat] || {}
+
     conn.pvp[m.chat][gameId] = {
         p1: m.sender,
-        p2: opponent,
+        p2: who,
         state: 'ESPERANDO_ACEPTACION',
         p1Choice: null,
         p2Choice: null,
@@ -38,17 +42,18 @@ let handler = async (m, { conn, prefix, who, db }) => {
         timeout: setTimeout(() => {
             if (conn.pvp[m.chat] && conn.pvp[m.chat][gameId]) {
                 delete conn.pvp[m.chat][gameId]
-                conn.sendMessage(m.chat, { text: '⏳ PVP cancelado por falta de respuesta.' })
+                conn.sendMessage(m.chat, { text: '⏳ PVP cancelado: Se acabó el tiempo de respuesta.' })
             }
         }, 30000)
     }
 
     await conn.sendMessage(m.chat, { 
-        text: `⚔️ *RETARON A @${opponent.split('@')[0]}*\n💰 Apuesta: ${apuesta} Coins\n\nEscribe *Aceptar* para pelear.`,
-        mentions: [m.sender, opponent]
+        text: `⚔️ *DUELO SOLICITADO* ⚔️\n\n@${m.sender.split('@')[0]} reta a @${who.split('@')[0]}\n💰 Apuesta: *${apuesta} Coins*\n\nEscribe *Aceptar* para pelear o *Rechazar*.`,
+        mentions: [m.sender, who]
     }, { quoted: m })
 }
 
+// Lógica de respuesta (Before)
 handler.before = async function (m, { conn }) {
     conn.pvp = conn.pvp ? conn.pvp : {}
     if (!conn.pvp[m.chat]) return
@@ -67,10 +72,14 @@ handler.before = async function (m, { conn }) {
             game.timeout = setTimeout(() => {
                 if (conn.pvp[m.chat] && conn.pvp[m.chat][gameId]) {
                     delete conn.pvp[m.chat][gameId]
-                    conn.sendMessage(m.chat, { text: '⏳ Tiempo agotado para elegir.' })
+                    conn.sendMessage(m.chat, { text: '⏳ Tiempo agotado para elegir jugada.' })
                 }
             }, 30000)
-            return m.reply('✅ Duelo aceptado. ¡Escriban: *Piedra*, *Papel* o *Tijera*!')
+            return m.reply('✅ Reto aceptado. ¡Escriban: *Piedra*, *Papel* o *Tijera*!\n(Mensajes ocultos)')
+        } else if (input === 'rechazar') {
+            clearTimeout(game.timeout)
+            delete conn.pvp[m.chat][gameId]
+            return m.reply('❌ Duelo rechazado.')
         }
     }
 
@@ -79,13 +88,11 @@ handler.before = async function (m, { conn }) {
         if (choices.includes(input)) {
             if (m.sender === game.p1 && !game.p1Choice) game.p1Choice = input
             if (m.sender === game.p2 && !game.p2Choice) game.p2Choice = input
-            
             try { await conn.sendMessage(m.chat, { delete: m.key }) } catch {}
 
             if (game.p1Choice && game.p2Choice) {
                 clearTimeout(game.timeout)
-                let win = ''
-                let { p1, p2, p1Choice: c1, p2Choice: c2 } = game
+                let win = '', p1 = game.p1, p2 = game.p2, c1 = game.p1Choice, c2 = game.p2Choice
                 let userDb = global.database.data.users
 
                 if (c1 === c2) win = 'empate'
@@ -93,15 +100,13 @@ handler.before = async function (m, { conn }) {
                 else win = p2
 
                 let res = `⚔️ *RESULTADOS* ⚔️\n\n@${p1.split('@')[0]}: ${c1}\n@${p2.split('@')[0]}: ${c2}\n\n`
-
-                if (win === 'empate') {
-                    res += '🤝 ¡Empate!'
-                } else {
+                if (win === 'empate') res += '🤝 ¡Empate! Nadie pierde nada.'
+                else {
                     let loser = (win === p1) ? p2 : p1
                     userDb[win].coin += game.bet
                     userDb[loser].coin -= game.bet
                     await database.save()
-                    res += `🎉 Ganador: @${win.split('@')[0]}\n💰 Ganancia: ${game.bet} Coins`
+                    res += `🎉 Ganador: @${win.split('@')[0]}\n💰 Ganaste: ${game.bet} Coins`
                 }
                 await conn.sendMessage(m.chat, { text: res, mentions: [p1, p2] })
                 delete conn.pvp[m.chat][gameId]
