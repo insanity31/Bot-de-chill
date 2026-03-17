@@ -1,32 +1,29 @@
-let linkRegex = /chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})/i
+let linkRegex = /chat\.whatsapp\.com\/([0-9A-Za-z]+)/i
 
 const isNumber = (x) => !isNaN(parseInt(x))
 
 let handler = async (m, { conn, text, isOwner }) => {
   try {
-    if (!text) return m.reply('♡ Darling... envíame un enlace válido 💗')
+    if (!text) return m.reply('♡ Darling... pásame un enlace de grupo 💗')
 
-    // 💗 Limpiar texto (por si viene con ?mode= o extras)
-    let cleanText = text.trim().split(' ')[0]
-
-    let match = cleanText.match(linkRegex)
-    if (!match) return m.reply('♡ Ese enlace no es válido... intenta otra vez')
+    // 💗 Buscar link en TODO el texto
+    let match = text.match(linkRegex)
+    if (!match) return m.reply('♡ Mmm... ese enlace no es válido Darling 💔')
 
     let code = match[1]
 
-    // 💗 Días
-    let daysStr = text.split(' ')[1]
+    // 💗 Días opcionales
+    let parts = text.trim().split(/\s+/)
+    let daysStr = parts.find(x => /^\d+$/.test(x))
     let days = 0
 
     if (isOwner) {
-      days = daysStr && isNumber(daysStr)
-        ? Math.min(999, Math.max(1, parseInt(daysStr)))
-        : 0
+      days = daysStr ? Math.min(999, Math.max(1, parseInt(daysStr))) : 0
     } else {
       days = 3
     }
 
-    // 💌 Unirse
+    // 💌 Unirse al grupo
     let groupId = await conn.groupAcceptInvite(code)
 
     // 💗 Nombre del grupo
@@ -51,14 +48,14 @@ let handler = async (m, { conn, text, isOwner }) => {
     }
 
     // 💬 Confirmación
-    await m.reply(`♡ Me uní a *${groupName}*...\n♡ ${days ? `Estaré ${days} día(s) contigo 💗` : 'Me quedaré contigo, Darling... 💗'}`)
+    await m.reply(`♡ Ya entré a *${groupName}*...\n♡ ${days ? `Me quedaré ${days} día(s) contigo 💗` : 'Me quedaré contigo, Darling... 💗'}`)
 
     // 🎥 Mensaje Zero Two
     let media = 'https://files.catbox.moe/sjak3i.jpg'
     let texto = `╭━━━〔 ♡ 𝒁𝒆𝒓𝒐 𝑻𝒘𝒐 ♡ 〕━━━⬣
 ┃ ❥ Ya llegué, Darling... 💗
-┃ ❥ ¿Me extrañabas?~
-┃ ❥ Usa mis comandos si me necesitas
+┃ ❥ Ahora este grupo es más divertido~
+┃ ❥ Llámame si me necesitas
 ╰━━━━━━━━━━━━━━━━⬣`
 
     await conn.sendMessage(groupId, {
@@ -70,7 +67,7 @@ let handler = async (m, { conn, text, isOwner }) => {
 
   } catch (e) {
     console.error(e)
-    m.reply('♡ No pude unirme... tal vez el enlace expiró 💔')
+    m.reply('♡ No pude entrar... quizá el enlace expiró o ya estoy dentro 💔')
   }
 }
 
