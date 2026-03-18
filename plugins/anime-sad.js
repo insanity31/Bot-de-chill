@@ -53,7 +53,7 @@ const handler = async (m, { conn, db }) => {
             mentions: [who]
         }, { quoted: m })
 
-        await m.react('💧')
+        await m.react('😥')
     } catch (e) {
         console.error(e)
         await m.react('💔')
