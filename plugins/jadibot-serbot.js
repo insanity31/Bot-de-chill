@@ -71,7 +71,7 @@ function msToTime(duration) {
   const seconds = Math.floor((duration / 1000) % 60)
   const minutes = Math.floor((duration / (1000 * 60)) % 60)
   const hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  return `\( {hours.toString().padStart(2, '0')}: \){minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 function isSocketReady(sock) {
@@ -96,7 +96,7 @@ setInterval(() => {
       return true
     })
     const removed = before - global.conns.length
-    if (removed > 0) console.log(chalk.blue(`[~] Limpiados ${removed} SubBots inactivos`))
+    if (removed > 0) console.log(chalk.blue(`[\~] Limpiados ${removed} SubBots inactivos`))
   } catch (error) {
     console.error('Error en limpieza:', error.message)
   }
@@ -156,7 +156,14 @@ export default pluginHandler
 async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
   const sessionId = path.basename(sessionPath)
   const metodoUsado = useCode ? 'Código' : 'QR'
-  let txtCode, codeBot, txtQR
+
+  // Nombre del usuario (se calcula una sola vez)
+  let nombreUsuario = 'Usuario'
+  try {
+    nombreUsuario = await conn.getName(m.sender) || m.pushName || 'Usuario'
+  } catch {
+    nombreUsuario = m.pushName || 'Usuario'
+  }
 
   try {
     const { state, saveCreds } = await useMultiFileAuthState(sessionPath)
@@ -183,18 +190,42 @@ async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
     const sock = makeWASocket(connectionOptions)
     sock.sessionPath = sessionPath
 
+    // ==================== FIX PRINCIPAL ====================
+    // El código de emparejamiento ahora se genera INMEDIATAMENTE después de crear el socket
+    // (esto es lo correcto en Baileys actual). Ya no depende del evento "qr".
+    // Se usa try/catch para no romper en reconexiones (sesión ya existente).
+    if (useCode) {
+      try {
+        let secret = await sock.requestPairingCode(m.sender.split('@')[0])
+        secret = secret?.match(/.{1,4}/g)?.join('-') || secret
+
+        const txtCode = await conn.sendMessage(m.chat, {
+          text: generarMensajeCodigo(nombreUsuario)
+        }, { quoted: m })
+
+        const codeBot = await m.reply(`> ${secret}`)
+
+        console.log(chalk.bold.greenBright(`\n◆ Código generado para ${nombreUsuario}: ${secret}\n`))
+
+        if (txtCode?.key) {
+          setTimeout(() => conn.sendMessage(m.chat, { delete: txtCode.key }).catch(() => {}), 30000)
+        }
+        if (codeBot?.key) {
+          setTimeout(() => conn.sendMessage(m.chat, { delete: codeBot.key }).catch(() => {}), 30000)
+        }
+      } catch (e) {
+        console.error('Error generando código (posible reconexión):', e.message)
+        // No mostramos error al usuario en reconexiones
+      }
+    }
+    // ====================================================
+
     sock.ev.on('connection.update', async update => {
       const { connection, lastDisconnect, qr } = update
 
-      let nombreUsuario = 'Usuario'
-      try {
-        nombreUsuario = await conn.getName(m.sender) || m.pushName || 'Usuario'
-      } catch {
-        nombreUsuario = m.pushName || 'Usuario'
-      }
-
+      // Solo QR (el código ya se maneja arriba)
       if (qr && !useCode) {
-        txtQR = await conn.sendMessage(m.chat, {
+        const txtQR = await conn.sendMessage(m.chat, {
           image: await qrcode.toBuffer(qr, { scale: 8 }),
           caption: generarMensajeQR(nombreUsuario)
         }, { quoted: m })
@@ -205,23 +236,8 @@ async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
         return
       }
 
-      if (qr && useCode) {
-        try {
-          let secret = await sock.requestPairingCode(m.sender.split('@')[0])
-          secret = secret?.match(/.{1,4}/g)?.join('-') || secret
-          txtCode = await conn.sendMessage(m.chat, { text: generarMensajeCodigo(nombreUsuario) }, { quoted: m })
-          codeBot = await m.reply(`> ${secret}`)
-          console.log(chalk.bold.greenBright(`\n◆ Código generado para ${nombreUsuario}: ${secret}\n`))
-          if (txtCode?.key) setTimeout(() => conn.sendMessage(m.chat, { delete: txtCode.key }).catch(() => {}), 30000)
-          if (codeBot?.key) setTimeout(() => conn.sendMessage(m.chat, { delete: codeBot.key }).catch(() => {}), 30000)
-        } catch (e) {
-          console.error('Error generando código:', e.message)
-        }
-        return
-      }
-
       if (connection === 'open') {
-        console.log(chalk.cyanBright(`\n◆ ${nombreUsuario} (+${sessionId}) conectado · Método: ${metodoUsado}`))
+        console.log(chalk.cyanBright(`\n◆ \( {nombreUsuario} (+ \){sessionId}) conectado · Método: ${metodoUsado}`))
 
         sock.startTime = Date.now()
         await loadEvents(sock).catch(() => {})
