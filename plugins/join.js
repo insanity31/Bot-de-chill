@@ -1,88 +1,95 @@
-let linkRegex = /(?:chat\.whatsapp\.com\/|https?:\/\/chat\.whatsapp\.com\/)([0-9A-Za-z]{20,24})/i
+const linkRegex = /chat\.whatsapp\.com\/([0-9A-Za-z]{20,24})/i
 
 const isNumber = (x) => !isNaN(x) && !isNaN(parseInt(x))
 
 let handler = async (m, { conn, text, isOwner, usedPrefix }) => {
   try {
     if (!text) {
-      return m.reply(`♡ Darling... pásame un enlace de grupo 💗\n\nEjemplo:\n${usedPrefix}join https://chat.whatsapp.com/ABCDEFGHIJK123456789 7`)
+      return m.reply(
+        `♡ Darling... pásame un enlace de grupo 💗\n\nEjemplo:\n${usedPrefix}join https://chat.whatsapp.com/ABCDEFGHIJK123456789 7`
+      )
     }
 
-    // Buscar el código del invite en cualquier parte del texto
+    // 🔍 Extraer código del link
     let match = text.match(linkRegex)
-    if (!match || !match[1]) {
-      return m.reply('♡ Mmm... ese enlace no parece válido, Darling 💔\nAsegúrate que sea un enlace de invitación de WhatsApp')
+    if (!match) {
+      return m.reply(
+        '♡ Mmm... ese enlace no parece válido 💔\nAsegúrate que sea un enlace de WhatsApp'
+      )
     }
 
     let code = match[1]
 
-    // ──────────────── Días de permanencia ────────────────
-    let days = 0
-    // Solo owners pueden elegir días
+    // 📅 Días
+    let days = 3 // default
+
     if (isOwner) {
-      // Buscar número al final o después del link
       let args = text.replace(linkRegex, '').trim().split(/\s+/)
-      let possibleDays = args.find(arg => isNumber(arg))
-      if (possibleDays) {
-        days = Math.max(1, Math.min(999, parseInt(possibleDays)))
+      let num = args.find(isNumber)
+
+      if (num) {
+        days = Math.max(1, Math.min(999, parseInt(num)))
       }
-    } else {
-      days = 3 // valor por defecto para no-owners
     }
 
-    // ──────────────── Intentar unirse ────────────────
+    // 🚪 Unirse al grupo
     let groupId
     try {
       groupId = await conn.groupAcceptInvite(code)
     } catch (err) {
-      if (err.message?.includes('already')) {
-        return m.reply('♡ Ya estoy en ese grupo, Darling... 💗')
+      let msg = err?.message || ''
+
+      if (msg.includes('already')) {
+        return m.reply('♡ Ya estoy en ese grupo, Darling 💗')
       }
-      if (err.message?.includes('expired') || err.message?.includes('invalid')) {
-        return m.reply('♡ El enlace está expirado o es inválido 💔')
+      if (msg.includes('expired') || msg.includes('invalid')) {
+        return m.reply('♡ El enlace está expirado o inválido 💔')
       }
+
       throw err
     }
 
-    if (!groupId?.endsWith('@g.us')) {
-      return m.reply('♡ Algo salió mal... no obtuve un ID de grupo válido 💔')
+    if (!groupId || !groupId.endsWith('@g.us')) {
+      return m.reply('♡ No obtuve un ID válido 💔')
     }
 
-    // ──────────────── Obtener nombre del grupo ────────────────
+    // 📛 Nombre del grupo
     let groupName = 'Grupo desconocido'
     try {
       let meta = await conn.groupMetadata(groupId)
-      if (meta?.subject) groupName = meta.subject
-    } catch (e) {}
+      groupName = meta?.subject || groupName
+    } catch {}
 
-    // ──────────────── Guardar en DB ────────────────
-    global.db = global.db || { data: {} }
-    global.db.data = global.db.data || {}
-    global.db.data.chats = global.db.data.chats || {}
+    // 💾 Guardar en DB
+    global.db ||= { data: {} }
+    global.db.data ||= {}
+    global.db.data.chats ||= {}
 
     let chats = global.db.data.chats
-    chats[groupId] = chats[groupId] || {}
+    chats[groupId] ||= {}
 
     if (days > 0) {
-      chats[groupId].expired = Date.now() + (days * 86400000)
-      chats[groupId].joinDate = Date.now() // opcional: para tracking
+      chats[groupId].expired = Date.now() + days * 86400000
+      chats[groupId].joinDate = Date.now()
     } else {
       delete chats[groupId].expired
     }
 
-    // ──────────────── Mensaje de confirmación al usuario ────────────────
+    // ✅ Confirmación
     await m.reply(
-      `♡ Ya entré a *${groupName}*... 💗\n` +
-      `${days ? `Me quedaré ${days} día(s) contigo\~` : 'Me quedaré contigo para siempre, Darling... ♡'}`
+      `♡ Ya entré a *${groupName}* 💗\n` +
+      (days
+        ? `Me quedaré ${days} día(s) contigo~`
+        : 'Me quedaré para siempre contigo, Darling ♡')
     )
 
-    // ──────────────── Mensaje de bienvenida en el grupo (Zero Two style) ────────────────
-    let media = 'https://files.catbox.moe/sjak3i.jpg' // verifica que este link siga funcionando
+    // 🎬 Bienvenida
+    let media = 'https://files.catbox.moe/sjak3i.jpg'
 
     let welcomeText = `╭━━━〔 ♡ 𝒁𝒆𝒓𝒐 𝑻𝒘𝒐 ♡ 〕━━━⬣
 ┃ ❥ Ya llegué, Darling... 💗
-┃ ❥ Ahora este grupo es más divertido\~
-┃ ❥ Llámame si me necesitas\~ ♡
+┃ ❥ Ahora este grupo es más divertido~
+┃ ❥ Llámame si me necesitas ♡
 ╰━━━━━━━━━━━━━━━━⬣`
 
     await conn.sendMessage(groupId, {
@@ -94,12 +101,15 @@ let handler = async (m, { conn, text, isOwner, usedPrefix }) => {
 
   } catch (e) {
     console.error('[join]', e)
+
     let msg = '♡ No pude entrar... 💔\n'
-    if (e.message?.includes('already')) msg += 'Ya estoy en ese grupo\~'
-    else if (e.message?.includes('expired')) msg += 'El enlace expiró...'
-    else if (e.message?.includes('limit')) msg += 'Límite de uniones alcanzado...'
-    else msg += 'Ocurrió un error inesperado'
-    
+    let errMsg = e?.message || ''
+
+    if (errMsg.includes('already')) msg += 'Ya estoy en ese grupo~'
+    else if (errMsg.includes('expired')) msg += 'El enlace expiró...'
+    else if (errMsg.includes('limit')) msg += 'Límite de uniones alcanzado...'
+    else msg += 'Error inesperado'
+
     await m.reply(msg)
   }
 }
@@ -107,8 +117,8 @@ let handler = async (m, { conn, text, isOwner, usedPrefix }) => {
 handler.help = ['join <link> [días]']
 handler.tags = ['owner']
 handler.command = /^(join|entrar)$/i
-handler.owner = false          // ← puedes dejarlo false si quieres que todos lo usen
+handler.owner = false
 handler.group = false
-handler.private = true         // recomendable
+handler.private = true
 
 export default handler
