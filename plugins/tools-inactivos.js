@@ -2,7 +2,7 @@ let handler = async (m, { conn, isAdmin, isOwner }) => {
     if (!m.isGroup) return m.reply('💔 Solo funciona en grupos darling\~')
     if (!isAdmin && !isOwner) return m.reply('💔 Solo admins y owner pueden usar este comando')
 
-    await m.react('🍬')
+    await m.react('⌛')
 
     const group = await conn.groupMetadata(m.chat)
     const participants = group.participants
