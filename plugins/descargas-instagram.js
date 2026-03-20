@@ -12,17 +12,17 @@ function clean(str = '') {
     .replace(/&amp;/g, '&')
 }
 
+function isValidVideo(url = '') {
+  return url.includes('.mp4') && url.includes('cdninstagram')
+}
+
 async function fetchData(url) {
   const res = await fetch(url, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "User-Agent": "Mozilla/5.0 (Linux; Android 10)",
       "Accept": "*/*",
       "Accept-Language": "es-ES,es;q=0.9",
-      "Referer": "https://www.instagram.com/",
-      "Origin": "https://www.instagram.com",
-      "Connection": "keep-alive"
-      // 🔥 OPCIONAL (MEJORA MUCHO):
-      // "Cookie": "sessionid=TU_SESSION_ID"
+      "Referer": "https://www.instagram.com/"
     }
   })
 
@@ -33,11 +33,9 @@ async function fetchData(url) {
 function extractVideo(html) {
   let results = []
 
-  // 🔥 Método 1: og:video
   let og = html.match(/property="og:video" content="([^"]+)"/)
   if (og) results.push(clean(og[1]))
 
-  // 🔥 Método 2: JSON video_url
   let json = html.match(/"video_url":"([^"]+)"/g)
   if (json) {
     json.forEach(x => {
@@ -46,34 +44,16 @@ function extractVideo(html) {
     })
   }
 
-  // 🔥 Método 3: display_resources (fallback)
-  let fallback = html.match(/https:\/\/[^"]+\.cdninstagram\.com[^"]+/g)
-  if (fallback) {
-    fallback.forEach(x => results.push(clean(x)))
-  }
-
   return [...new Set(results)]
 }
 
-async function fallbackAPI(url) {
+async function checkVideo(url) {
   try {
-    let api = url.split('?')[0] + '?__a=1&__d=dis'
-    let res = await fetchData(api)
-    let json = JSON.parse(res)
-
-    let media = json?.graphql?.shortcode_media
-
-    if (media?.video_url) return media.video_url
-
-    if (media?.edge_sidecar_to_children?.edges) {
-      for (let x of media.edge_sidecar_to_children.edges) {
-        if (x.node.video_url) return x.node.video_url
-      }
-    }
-
-    return null
+    let res = await fetch(url, { method: 'HEAD' })
+    let size = res.headers.get('content-length')
+    return size && parseInt(size) > 50000
   } catch {
-    return null
+    return false
   }
 }
 
@@ -91,17 +71,22 @@ let handler = async (m, { conn, args }) => {
     const html = await fetchData(url)
     let videos = extractVideo(html)
 
-    // 🔥 fallback si no encuentra
-    if (videos.length === 0) {
-      let fb = await fallbackAPI(url)
-      if (fb) videos.push(fb)
+    videos = videos.filter(v => isValidVideo(v))
+
+    let valid = null
+
+    for (let v of videos) {
+      if (await checkVideo(v)) {
+        valid = v
+        break
+      }
     }
 
-    if (videos.length === 0) throw new Error('NO_VIDEO')
+    if (!valid) throw new Error('NO_VIDEO')
 
     await conn.sendMessage(m.chat, {
-      video: { url: videos[0] },
-      caption: '✅ Video descargado (Instagram PRO)'
+      video: { url: valid },
+      caption: '✅ Video descargado'
     }, { quoted: m })
 
     await conn.sendMessage(m.chat, {
@@ -115,7 +100,7 @@ let handler = async (m, { conn, args }) => {
       msg += '🌐 Error de conexión\n' + e.message
     } else if (e.message === 'NO_VIDEO') {
       msg += '🚫 Instagram bloqueó el scraping\n'
-      msg += '💡 Usa cookies (sessionid) para mejorar'
+      msg += '💡 Prueba otro link o más tarde'
     } else {
       msg += '⚠️ Error inesperado\n' + e.message
     }
@@ -124,6 +109,6 @@ let handler = async (m, { conn, args }) => {
   }
 }
 
-handler.command = ['ig', 'instagram']
+handler.command = ['ig']
 
 export default handler
