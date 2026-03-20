@@ -18,11 +18,13 @@ function isValidVideo(url = '') {
 
 function getHeaders() {
   return {
-    "User-Agent": "Mozilla/5.0 (Linux; Android 10)",
+    "User-Agent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
     "Accept": "*/*",
     "Accept-Language": "es-ES,es;q=0.9",
     "X-IG-App-ID": "936619743392459",
-    "Referer": "https://www.instagram.com/"
+    "Referer": "https://www.instagram.com/",
+    "Origin": "https://www.instagram.com",
+    "Connection": "keep-alive"
   }
 }
 
@@ -53,13 +55,14 @@ function extractFromHTML(html) {
 
 async function tryGraphQL(shortcode) {
   try {
-    const url = `https://www.instagram.com/graphql/query/?query_hash=9f8827793ef34641b2fb195d4d41151c&variables=${encodeURIComponent(JSON.stringify({
+    const variables = {
       shortcode,
-      child_comment_count: 3,
-      fetch_comment_count: 40,
-      parent_comment_count: 24,
-      has_threaded_comments: true
-    }))}`
+      fetch_tagged_user_count: null,
+      hoisted_comment_id: null,
+      hoisted_reply_id: null
+    }
+
+    const url = `https://www.instagram.com/graphql/query/?query_hash=2b0673e0dc4580674a88d426fe00ea90&variables=${encodeURIComponent(JSON.stringify(variables))}`
 
     const res = await fetch(url, { headers: getHeaders() })
     if (!res.ok) return null
@@ -78,16 +81,6 @@ async function tryGraphQL(shortcode) {
     return null
   } catch {
     return null
-  }
-}
-
-async function checkVideo(url) {
-  try {
-    let res = await fetch(url, { method: 'HEAD' })
-    let size = res.headers.get('content-length')
-    return size && parseInt(size) > 50000
-  } catch {
-    return false
   }
 }
 
@@ -117,14 +110,7 @@ let handler = async (m, { conn, args }) => {
 
     videos = videos.filter(v => isValidVideo(v))
 
-    let valid = null
-
-    for (let v of videos) {
-      if (await checkVideo(v)) {
-        valid = v
-        break
-      }
-    }
+    let valid = videos[0] || null
 
     if (!valid) throw new Error('NO_VIDEO')
 
@@ -144,7 +130,7 @@ let handler = async (m, { conn, args }) => {
       msg += '🌐 Error de conexión\n' + e.message
     } else {
       msg += '🚫 Instagram bloqueó el acceso\n'
-      msg += '💡 Intenta con otro reel público'
+      msg += '💡 Prueba con otro reel público'
     }
 
     await m.reply(msg)
