@@ -30,7 +30,7 @@ const prefixZT = '🌸 𝐙𝐞𝐫𝐨-𝐓𝐰𝐨'
 
 const generarMensajeCodigo = (nombre) => `${prefixZT} 🌸
 
-  Darling, aquí tienes tu código de conexión:
+  Darling, aquí tienes tu código de 8 dígitos:
   👤 Usuario: ${nombre}
   
   ✨ Pasos:
@@ -38,7 +38,7 @@ const generarMensajeCodigo = (nombre) => `${prefixZT} 🌸
   2️⃣ Toca los 3 puntitos arriba a la derecha.
   3️⃣ Dispositivos vinculados > Vincular un dispositivo.
   4️⃣ Abajo, elige "Vincular con número de teléfono".
-  5️⃣ Pon el código de abajo.`
+  5️⃣ Pon el código que te envié abajo.`
 
 const generarMensajeQR = (nombre) => `${prefixZT} 🌸
 
@@ -48,7 +48,7 @@ const generarMensajeQR = (nombre) => `${prefixZT} 🌸
   ✨ Pasos:
   1️⃣ Abre WhatsApp.
   2️⃣ Toca los 3 puntitos > Dispositivos vinculados.
-  3️⃣ Escanea este QR.
+  3️⃣ Escanea esta imagen.
 
   ⚠️ Expira en 45 segundos.`
 
@@ -145,15 +145,16 @@ let pluginHandler = async (m, { conn, args, prefix, command }) => {
 
   database.data.users[userId].Subs = now
 
-  // Optimizado: Usamos el command directamente en vez de m.body
+  // Aquí definimos qué método usar: Si el comando es "code", usa 8 dígitos. Si no (qr, serbot), usa QR.
   const useCode = command === 'code'
 
   await startSubBot({ m, conn, args, prefix, sessionPath, useCode })
 }
 
-pluginHandler.help = ['code', 'serbot']
+// Añadí 'qr' a la lista de comandos para que lo detecte sin problemas
+pluginHandler.help = ['code', 'qr', 'serbot']
 pluginHandler.tags = ['serbot']
-pluginHandler.command = ['code', 'serbot']
+pluginHandler.command = ['code', 'qr', 'serbot']
 
 export default pluginHandler
 
@@ -196,7 +197,7 @@ async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
         nombreUsuario = await conn.getName(m.sender) || nombreUsuario
       } catch {}
 
-      // Generar QR
+      // Generar QR (Solo si se usó #qr o #serbot)
       if (qr && !useCode) {
         txtQR = await conn.sendMessage(m.chat, {
           image: await qrcode.toBuffer(qr, { scale: 8 }),
@@ -209,15 +210,17 @@ async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
         return
       }
 
-      // Generar Código
+      // Generar Código de 8 Dígitos (Solo si se usó #code)
       if (qr && useCode) {
         try {
           let secret = await sock.requestPairingCode(m.sender.split('@')[0])
+          // Formatea el código para que se vea como XXXX-XXXX
           secret = secret?.match(/.{1,4}/g)?.join('-') || secret
+          
           txtCode = await conn.sendMessage(m.chat, { text: generarMensajeCodigo(nombreUsuario) }, { quoted: m })
           codeBot = await m.reply(`> ${secret}`)
           
-          console.log(chalk.bold.magentaBright(`\n[Zero-Two] 🌸 Código para ${nombreUsuario}: ${secret}\n`))
+          console.log(chalk.bold.magentaBright(`\n[Zero-Two] 🌸 Código de 8 dígitos para ${nombreUsuario}: ${secret}\n`))
           
           if (txtCode?.key) setTimeout(() => conn.sendMessage(m.chat, { delete: txtCode.key }).catch(() => {}), 30000)
           if (codeBot?.key) setTimeout(() => conn.sendMessage(m.chat, { delete: codeBot.key }).catch(() => {}), 30000)
@@ -258,7 +261,6 @@ async function startSubBot({ m, conn, args, prefix, sessionPath, useCode }) {
           DisconnectReason.badSession
         ].includes(reason)) {
           console.log(chalk.yellow(`\n[Zero-Two] 🔄 Reconectando (+${sessionId})... Razón: ${reason}`))
-          // Retraso de 3 segundos para no saturar si hay ciclo infinito de caídas
           setTimeout(() => startSubBot({ m, conn, args, prefix, sessionPath, useCode }), 3000)
         } else if ([
           DisconnectReason.loggedOut,
