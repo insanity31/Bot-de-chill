@@ -12,7 +12,7 @@ const handler = async (msg, { conn, args, usedPrefix, command }) => {
 
     return conn.sendMessage(
       msg.chat,
-      { text: `✳️ Usa:\n${usedPrefix} ${command} <descripción>` },
+      { text: `✳️ Usa:\n.flux <descripción>` },
       { quoted: msg }
     )
   }
@@ -46,7 +46,7 @@ const handler = async (msg, { conn, args, usedPrefix, command }) => {
 }
 
 handler.help = ['flux <descripción>']
-handler.tags = ['ai']
+handler.tags = ['tools']
 handler.command = ['flux']
 
 export default handler
