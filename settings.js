@@ -38,9 +38,9 @@ global.currencySymbol = 'Stamps';
 global.welcom1 = '🎭 ¡Bienvenido a la locura otaku! 🎭\nEdita este mensaje con setwelcome 🔥';
 global.welcom2 = '🥀 ¡Hasta la próxima, otaku! 🥀\nLa locura te espera de regreso 🎭\nEdita este mensaje con setbye 🥀';
 
-global.banner = 'https://wallpapers.com/images/hd/anime-insanity-1j4mw86y6ncyfvj2.jpg';
-global.bannerUrl = 'https://wallpapers.com/images/hd/anime-insanity-1j4mw86y6ncyfvj2.jpg';
-global.avatar = 'https://wallpapers.com/images/featured/anime-insanity-j468lgu4oedsxfla.jpg';
+global.banner = 'https://adofiles.i11.eu/dl/3gl6.jpg';
+global.bannerUrl = 'https://adofiles.i11.eu/dl/asvu.png';
+global.avatar = 'https://adofiles.i11.eu/dl/v35m.png';
 global.iconUrl = 'https://wallpapers.com/images/featured/anime-insanity-j468lgu4oedsxfla.jpg';
 global.catalogo = null;
 global.catalogImage = null;
