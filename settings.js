@@ -35,8 +35,8 @@ global.etiqueta = 'insanitybot';
 global.moneda = 'Stamps';
 global.currencySymbol = 'Stamps';
 
-global.welcom1 = '🎭 ¡Bienvenido a la cueva de los otakus! 🎭\nEdita este mensaje con setwelcome 🔥';
-global.welcom2 = '🥀 ¡Hasta la próxima, otaku! 🥀\ vuelveieie🗣️‼️🔥 🎭\nEdita este mensaje con setbye 🥀';
+global.welcom1 = '🎭 ¡Bienvenido a la cueva de los otakus locos! 🎭\n🎴 Prepárate para la locura total 🎴\n🗣️ Disfruta y causa caos 🔥\nEdita este mensaje con setwelcome';
+global.welcom2 = '🥀 ¡Hasta la próxima, otaku loco! 🥀\n🗣️ La locura siempre te esperará 🔥\n🎭 ¡Vuelve pronto a desatar el caos! 🎭\nEdita este mensaje con setbye';
 
 global.banner = 'https://adofiles.i11.eu/dl/3gl6.jpg';
 global.bannerUrl = 'https://adofiles.i11.eu/dl/asvu.png';
@@ -90,7 +90,13 @@ global.ch = {
     ch1: '120363401404146384@newsletter',
 };
 
+// API Configurations con la key completa de apicausas
 global.apiConfigs = {
+    apicausas: { 
+        baseUrl: 'https://rest.apicausas.xyz', 
+        key: 'causa-a59e3676643b28e7',
+        extraKey: 'a59e3676643b28e7' 
+    },
     stellar: { baseUrl: 'https://api.stellarwa.xyz', key: null },
     xyro: { baseUrl: 'https://api.xyro.site', key: null },
     yupra: { baseUrl: 'https://api.yupra.my.id', key: null },
@@ -100,26 +106,26 @@ global.apiConfigs = {
     nekolabs: { baseUrl: 'https://api.nekolabs.web.id', key: null },
     ootaizumi: { baseUrl: 'https://api.ootaizumi.web.id', key: null },
     apifaa: { baseUrl: 'https://api-faa.my.id', key: null },
-    apicausas: { baseUrl: 'https://rest.apicausas.xyz.id', key: 'causa', extraKey: 'a59e3676643b28e7' },
 };
 
+// API principal con la key completa
 global.api = {
     url: 'https://rest.apicausas.xyz',
-    key: 'causa'
+    key: 'causa-a59e3676643b28e7'
 };
 
 global.APIs = {
+    apicausas: 'https://rest.apicausas.xyz',
     stellar: 'https://api.stellarwa.xyz',
     xyro: 'https://api.xyro.site',
     yupra: 'https://api.yupra.my.id',
     vreden: 'https://api.vreden.web.id',
     delirius: 'https://api.delirius.store',
     siputzx: 'https://api.siputzx.my.id',
-    apicausas: 'https://rest.apicausas.xyz'
 };
 
 global.APIKeys = {
-    'https://rest.apicausas.xyz': 'causa',
+    'https://rest.apicausas.xyz': 'causa-a59e3676643b28e7',
 };
 
 global.multiplier = 60;
@@ -146,6 +152,8 @@ for (const dir of directories) {
 }
 
 console.log(chalk.greenBright("✅ settings.js cargado correctamente."));
+console.log(chalk.cyanBright(`🎭 API Principal: ${global.api.url}`));
+console.log(chalk.cyanBright(`🔑 API Key: ${global.api.key}`));
 
 let file = scriptPath;
 watchFile(file, (curr, prev) => {
