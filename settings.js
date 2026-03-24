@@ -29,7 +29,7 @@ global.botName = 'Insanity Bot';
 global.wm = '🎴 ɪɴꜱᴀɴɪᴛʏ ʙᴏᴛ 🎴';
 global.author = '© ᴏᴛᴀᴋᴜ ᴄᴏᴍᴍᴜɴɪᴛʏ';
 global.dev = '© 🄿🄾🅆🄴🅁🄴🄳 ɪɴꜱᴀɴɪᴛʏ31';
-global.textbot = '🎭 ʙɪᴇɴᴠᴇɴɪᴅᴏ ᴀʟ ʟᴏᴄᴏ ᴍᴜɴᴅᴏ ᴅᴇʟ ᴀɴɪᴍᴇ, ᴘʀᴇᴘᴀʀᴀᴛᴇ ᴘᴀʀᴀ ʟᴀ ʟᴏᴄᴜʀᴀ 🎭';
+global.textbot = '🎭 ʙɪᴇɴᴠᴇɴɪᴅᴏ a mi mundo, ᴘʀᴇᴘᴀʀᴀᴛᴇ ᴘᴀʀᴀ ʟᴀ ʟᴏᴄᴜʀᴀ 🎭';
 global.etiqueta = 'insanitybot';
 
 global.moneda = 'Stamps';
@@ -60,9 +60,9 @@ global.devCredit = '© ɪɴꜱᴀɴɪᴛʏ ᴛᴇᴀᴍ';
 global.authorCredit = '© ᴏᴛᴀᴋᴜ ᴄᴏᴍᴍᴜɴɪᴛʏ';
 
 global.groupLink = 'https://chat.whatsapp.com/tu-link-grupo';
-global.communityLink = 'https://whatsapp.com/channel/0029Vb6p68rF6smrH4Jeay3Y';
-global.channelLink = 'https://whatsapp.com/channel/0029Vb6p68rF6smrH4Jeay3Y';
-global.gitHubRepo = 'https://github.com/zoredevteam-ctrl/Zore-two.git';
+global.communityLink = 'https://chat.whatsapp.com/GPfABUmCuVN2Qu1d1PPcBY';
+global.channelLink = 'https://whatsapp.com/channel/0029Vb73g1r1NCrTbefbFQ2T';
+global.gitHubRepo = 'https://github.com/insanity31/Bot-de-chill.git';
 global.emailContact = 'Insanitybot@gmail.com';
 global.correo = 'Insanitybot@gmail.com';
 
