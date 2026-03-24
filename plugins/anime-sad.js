@@ -56,8 +56,8 @@ const handler = async (m, { conn, db }) => {
         await m.react('😥')
     } catch (e) {
         console.error(e)
-        await m.react('💔')
-        m.reply('💔 Algo salió mal enviando la tristeza~')
+        await m.react('🗣️')
+        m.reply('deja de llorar maldita puta 🗿')
     }
 }
 
