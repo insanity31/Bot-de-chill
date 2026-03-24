@@ -35,13 +35,13 @@ global.etiqueta = 'insanitybot';
 global.moneda = 'Stamps';
 global.currencySymbol = 'Stamps';
 
-global.welcom1 = '🎭 ¡Bienvenido a la locura otaku! 🎭\nEdita este mensaje con setwelcome 🔥';
-global.welcom2 = '🥀 ¡Hasta la próxima, otaku! 🥀\nLa locura te espera de regreso 🎭\nEdita este mensaje con setbye 🥀';
+global.welcom1 = '🎭 ¡Bienvenido a la cueva de los otakus! 🎭\nEdita este mensaje con setwelcome 🔥';
+global.welcom2 = '🥀 ¡Hasta la próxima, otaku! 🥀\ vuelveieie🗣️‼️🔥 🎭\nEdita este mensaje con setbye 🥀';
 
 global.banner = 'https://adofiles.i11.eu/dl/3gl6.jpg';
 global.bannerUrl = 'https://adofiles.i11.eu/dl/asvu.png';
 global.avatar = 'https://adofiles.i11.eu/dl/v35m.png';
-global.iconUrl = 'https://wallpapers.com/images/featured/anime-insanity-j468lgu4oedsxfla.jpg';
+global.iconUrl = 'https://adofiles.i11.eu/dl/bju4.jpg';
 global.catalogo = null;
 global.catalogImage = null;
 
@@ -91,7 +91,7 @@ global.ch = {
 };
 
 global.apiConfigs = {
-    stellar: { baseUrl: 'https://api.stellarwa.xyz', key: 'YukiWaBot', extraKey: '1bcd4698ce6c75217275c9607f01fd99' },
+    stellar: { baseUrl: 'https://api.stellarwa.xyz', key: null },
     xyro: { baseUrl: 'https://api.xyro.site', key: null },
     yupra: { baseUrl: 'https://api.yupra.my.id', key: null },
     vreden: { baseUrl: 'https://api.vreden.web.id', key: null },
@@ -100,11 +100,12 @@ global.apiConfigs = {
     nekolabs: { baseUrl: 'https://api.nekolabs.web.id', key: null },
     ootaizumi: { baseUrl: 'https://api.ootaizumi.web.id', key: null },
     apifaa: { baseUrl: 'https://api-faa.my.id', key: null },
+    apicausas: { baseUrl: 'https://rest.apicausas.xyz.id', key: 'causa', extraKey: 'a59e3676643b28e7' },
 };
 
 global.api = {
-    url: 'https://api.stellarwa.xyz',
-    key: 'YukiWaBot'
+    url: 'https://rest.apicausas.xyz',
+    key: 'causa'
 };
 
 global.APIs = {
@@ -114,10 +115,11 @@ global.APIs = {
     vreden: 'https://api.vreden.web.id',
     delirius: 'https://api.delirius.store',
     siputzx: 'https://api.siputzx.my.id',
+    apicausas: 'https://rest.apicausas.xyz'
 };
 
 global.APIKeys = {
-    'https://api.stellarwa.xyz': 'YukiWaBot',
+    'https://rest.apicausas.xyz': 'causa',
 };
 
 global.multiplier = 60;
