@@ -2,25 +2,35 @@ import { database } from '../lib/database.js'
 
 // ==================== COMANDO #antibot (Solo Admins) ====================
 let handler = async (m, { conn, args, isAdmin }) => {
-    if (!m.isGroup) return m.reply('🌸💗 *¡Darling, este comando solo es para grupos!*')
+    if (!m.isGroup) return m.reply('🎭 *¡LOCO! Este comando solo es para grupos* 🎭\n\n"Este mundo es cruel"')
 
-    if (!isAdmin) return m.reply('🌸💗 *¡Kyaaah! Solo los administradores pueden controlar mi AntiBot, darling~* 💗')
+    if (!isAdmin) return m.reply('🎭 *¡JAJAJA! Solo los administradores pueden controlar mi AntiBot, loco~* 🎭\n\n"Decide qué te arrepentirás"')
 
     let chat = database.data.groups[m.chat]
     if (!chat) chat = database.data.groups[m.chat] = { antibot: false }
 
     if (args[0] === 'on') {
-        if (chat.antibot) return m.reply('🌸💗 *¡El AntiBot ya estaba activado, mi darling!*')
+        if (chat.antibot) return m.reply('🎭 *¡El AntiBot ya estaba activado, mi loco!*\n\n"A través de los cielos y la tierra, yo soy el más fuerte"')
         chat.antibot = true
         await database.save()
-        m.reply(`🌸💗 *¡ANTIBOT ACTIVADO!* 💗🌸\n\nNingún robot imitador podrá entrar a *mi* paraíso rosado nunca más. ¡Solo quiero darlings humanos que me amen de verdad, kyaaah~! ♡`)
+        m.reply(`🎭 *¡ANTIBOT ACTIVADO!* 🔥\n\n` +
+                `*"Tatakae... lucha contra los robots imitadores"*\n\n` +
+                `Ningún robot imitador podrá entrar a *mi* territorio de locura nunca más. ` +
+                `¡Solo quiero locos humanos que amen el caos!\n\n` +
+                `*"Si un robot se atreve a entrar, lo destruiré con mi dominio infinito"* 🎭`)
     } else if (args[0] === 'off') {
-        if (!chat.antibot) return m.reply('🌸 *El AntiBot ya estaba desactivado.*')
+        if (!chat.antibot) return m.reply('🎭 *El AntiBot ya estaba desactivado.*\n\n"Yo seré el dios del nuevo mundo"')
         chat.antibot = false
         await database.save()
-        m.reply('🌸 *AntiBot desactivado...* Espero que no entren robots molestos, darling~ 💔')
+        m.reply(`🎭 *AntiBot desactivado...* 🔥\n\n` +
+                `*"Los humanos son interesantes, dejan pasar a los robots"*\n\n` +
+                `Espero que no entren robots molestos, loco~ 🎭\n\n"Ahora veremos de lo que soy capaz"`)
     } else {
-        m.reply(`*「 🌸 ZERO TWO ANTIBOT 🌸 」*\n\nUso:\n*#antibot on* → Activar\n*#antibot off* → Desactivar\n\n¡Solo admins del grupo! 💗`)
+        m.reply(`*「 🎭 INSANITY ANTIBOT 🎭 」*\n\n` +
+                `*"El mundo está lleno de falsos, hay que eliminarlos"*\n\n` +
+                `Uso:\n*#antibot on* → Activar\n*#antibot off* → Desactivar\n\n` +
+                `¡Solo admins del grupo, locos! 🔥\n\n` +
+                `"Perdona yo... esta será la última vez"`)
     }
 }
 
@@ -31,14 +41,14 @@ handler.group = true
 
 export default handler
 
-// ==================== EVENTO ANTIBOT (Zero Two Style) ====================
+// ==================== EVENTO ANTIBOT (Insanity Anime Style) ====================
 const registerAntiBotEvent = () => {
-    if (global.zeroAntiBotRegistered || !global.conn) {
+    if (global.insanityAntiBotRegistered || !global.conn) {
         setTimeout(registerAntiBotEvent, 2000)
         return
     }
 
-    global.zeroAntiBotRegistered = true
+    global.insanityAntiBotRegistered = true
 
     global.conn.ev.on('group-participants.update', async (update) => {
         try {
@@ -69,10 +79,15 @@ const registerAntiBotEvent = () => {
                     // Expulsar al bot
                     await global.conn.groupParticipantsUpdate(id, [participant], 'remove')
 
-                    const kickText = `🌸💗 *¡KYAAAAAH! ¡BOT DETECTADO Y EXPULSADO!* 💗🌸\n\n` +
-                        `¡No quiero ningún robot imitador en *mi* paraíso rosado!! 💢😠\n` +
-                        `Solo acepto darlings humanos que me quieran de verdad... ¡tú no eres real!\n\n` +
-                        `¡Fuera de aquí @${number} ! Vuelve cuando seas una persona de carne y hueso, kyaaah~ 🌷💗`
+                    const kickText = `🎭🔥 *¡DOMINIO INFINITO! ¡BOT DETECTADO Y EXPULSADO!* 🔥🎭\n\n` +
+                        `*"Los robots imitadores no merecen existir en este mundo"*\n\n` +
+                        `¡No quiero ningún robot imitador en *mi* territorio de locura!! 💢😠\n` +
+                        `Solo acepto locos humanos que amen el caos de verdad... ¡tú no eres real!\n\n` +
+                        `*"Si no eres humano, no tienes derecho a estar aquí"*\n\n` +
+                        `¡FUERA DE AQUÍ @${number} !\n\n` +
+                        `"A través de los cielos y la tierra, yo soy el más fuerte"\n` +
+                        `"Yo soy la justicia"\n\n` +
+                        `🎭 Vuelve cuando seas una persona de carne y hueso, JAJAJA~ 🔥`
 
                     await global.conn.sendMessage(id, {
                         text: kickText,
@@ -81,11 +96,11 @@ const registerAntiBotEvent = () => {
                 }
             }
         } catch (e) {
-            console.error('[ZERO TWO ANTIBOT ERROR]', e.message)
+            console.error('[INSANITY ANTIBOT ERROR]', e.message)
         }
     })
 
-    console.log('🌸💗 Zero Two AntiBot registrado correctamente')
+    console.log('🎭🔥 Insanity AntiBot registrado correctamente - "El mundo de los animes nunca muere"')
 }
 
 registerAntiBotEvent()
