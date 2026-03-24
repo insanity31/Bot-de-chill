@@ -6,18 +6,8 @@ import fs from 'fs';
 const scriptPath = fileURLToPath(import.meta.url);
 
 global.owner = [
-['573229506110', 'Dev1','true'],
-['51933000214', 'dev2'],
-['51941658192', 'dev3'],
-['5215911153853', 'dev4'],
-['59175850453', 'Dev5'],
-['584242773183', 'Dev6'],
-['5493863447787', 'Dev7'],
-['573107400303', 'Dev8'],
-['573133374132', 'Dev9'],
-['5214444854390', 'Dev10'],
-['5355699866', 'Hola'],
-['573135180876', 'duarte soporte']
+['584244733684', ' insanity31'],
+['573135180876', 'duartexv']
 ];
 global.mods = [];
 global.suittag = [];
@@ -33,20 +23,20 @@ global.namebot = 'Z E R O  T W O';
 global.sessions = './Sessions/Owner';
 global.jadi = 'JadiBots';
 
-global.packname = '💗 𝒁𝒆𝒓𝒐 𝑻𝒘𝒐 💗';
-global.botname = 'Zero Two';
-global.botName = 'Zero Two';
-global.wm = '💗◟𝓩𝓮𝓻𝓸 𝓣𝔀𝓸◞💗';
-global.author = '© ZoreDevTeam';
-global.dev = '© 🄿🄾🅆🄴🅁🄴🄳 ZoreDevTeam';
-global.textbot = '🌸 Zero Two, una guerrera que transforma cada batalla en una danza mortal con su Franxx. 💗⚔️🌸';
-global.etiqueta = '💗 ZoreDevTeam 💗';
+global.packname = 'insanity bot';
+global.botname = 'insanity bot';
+global.botName = 'imsanity bot';
+global.wm = '🎴 𝗕𝗼𝘁 𝗢𝘁𝗮𝗸𝘂 🎴';
+global.author = '© blue lock';
+global.dev = '© 🄿🄾🅆🄴🅁🄴🄳 insanity31';
+global.textbot = 'hola, este bot esta hecho a base de locura espero te guste 💎';
+global.etiqueta = 'insanitybot';
 
 global.moneda = 'Stamps';
 global.currencySymbol = 'Stamps';
 
-global.welcom1 = '¡Bienvenido a mi paraíso rosado! 💗\n✨ Soy Zero Two ✨\n🌸 Edita este mensaje con setwelcome 🌸';
-global.welcom2 = '💔 ¡Hasta la próxima, Darling! Gracias por estar aquí~\n🌸 ¡Espero verte pronto de nuevo! 🌸\n💗 Edita este mensaje con setbye 💗';
+global.welcom1 = '¡Bienvenido a mi mundo!, 🗣️Edita este mensaje con setwelcome 🔥';
+global.welcom2 = '🥀 ¡Hasta la próxima,! Gracias por existir 🫂¡Espero no volver a verte! 🥀 Edita este mensaje con setbye 🥀 ';
 
 global.banner = 'https://wallpapers.com/images/hd/zero-two-pictures-1j4mw86y6ncyfvj2.jpg';
 global.bannerUrl = 'https://wallpapers.com/images/hd/zero-two-pictures-1j4mw86y6ncyfvj2.jpg';
@@ -56,13 +46,13 @@ global.catalogo = null;
 global.catalogImage = null;
 
 global.botVersion = '1.0.0';
-global.botEmoji = '💗';
-global.emoji = '💗';
-global.emoji2 = '🌸';
-global.emoji3 = '💕';
-global.prefix = '.';
+global.botEmoji = '🗣️';
+global.emoji = '💎';
+global.emoji2 = '🗿';
+global.emoji3 = '🔥';
+global.prefix = '🗣️';
 
-global.botText = '❖ 𝐙𝐄𝐑𝐎 𝐓𝐖𝐎 ❖ - power by ZoreDevTeam';
+global.botText = '❖ 404_𝕴𝖓𝖘𝖆𝖓𝖎𝖙𝖞_𝕭𝖔𝖙 ❖ - power by ZoreDevTeam';
 global.botTag = '✰ 𝐙𝐄𝐑𝐎 𝐓𝐖𝐎 ✰ (•̀ᴗ•́)و';
 global.devCredit = '© ZoreDevTeam';
 global.authorCredit = '© ZoreDevTeam';
@@ -88,7 +78,7 @@ global.rcanal = {
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363401404146384@newsletter',
-            serverMessageId: 100,
+            serverMeId: 100,
             newsletterName: '💗 𝐙𝐄𝐑𝐎 𝐓𝐖𝐎 💗'
         }
     }
