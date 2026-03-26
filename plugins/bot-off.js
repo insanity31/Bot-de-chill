@@ -13,7 +13,7 @@ let handler = async (m, { conn, args, prefix, command, isOwner }) => {
         let action = args[0]?.toLowerCase()
 
         if (action !== 'on' && action !== 'off') {
-            return m.reply(`✦ 𝓩𝓮𝓻𝓸 𝓣𝔀𝓸\n\n⚠️ Uso incorrecto, darling.\nEjemplo: *${prefix + command} on* o *${prefix + command} off*`)
+            return m.reply(`✦ insanity\n\n⚠️ lo escribiste mal estupido.\nEjemplo: *${prefix + command} on* o *${prefix + command} off*`)
         }
 
         if (!database.data.groups) database.data.groups = {}
@@ -24,7 +24,7 @@ let handler = async (m, { conn, args, prefix, command, isOwner }) => {
 
         if (!estado) return
 
-        await m.reply('✦ 𝓩𝓮𝓻𝓸 𝓣𝔀𝓸\n\n✅ *Bot activado*\nAhora responderé a todos en este grupo, darling~')
+        await m.reply('✦ insanity\n\n✅ *Bot activado*\nAhora responderé a todos en este grupo,...---...')
         await m.react('✅')
         return
     }
