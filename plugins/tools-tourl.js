@@ -41,20 +41,14 @@ async function upload(buffer) {
 
 let handler = async (m, { conn }) => {
   try {
-    const quoted = m.quoted?.message || m.message
-    const media = getMedia(quoted)
+    const quoted = m.quoted ? m.quoted : m
+    const media = getMedia(quoted.message)
 
     if (!media) return m.reply('Responde a una imagen, video, sticker o audio')
 
     await m.react('☁️')
 
-    const buffer = await conn.downloadMediaMessage(
-      { message: quoted },
-      'buffer',
-      {},
-      { logger: conn.logger }
-    )
-
+    const buffer = await quoted.download()
     if (!buffer) throw 'No se pudo descargar'
 
     if (buffer.length > 200 * 1024 * 1024) throw 'Archivo mayor a 200MB'
