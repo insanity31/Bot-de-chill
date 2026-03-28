@@ -1,4 +1,4 @@
-// dejar créditos a IAM-GABRIEL 
+// dejar créditos a ZERO TWO
 
 import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 import FormData from 'form-data'
