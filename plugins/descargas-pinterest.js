@@ -34,9 +34,9 @@ async function sendAlbumMessage(conn, jid, medias, options = {}) {
 }
 
 const pinterest = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `✎ Uso Correcto: \n> ${usedPrefix + command} Goku`, m, global.rcanal);
+    if (!text) return m.reply(`✎ Uso Correcto: \n> ${usedPrefix + command} Goku`);
     await m.react('⏳');
-    conn.reply(m.chat, '✎ Descargando imágenes de Pinterest...', m);
+    m.reply('✎ Descargando imágenes de Pinterest...');
     try {
         const res = await fetch(`https://api.alyacore.xyz/search/pinterest?query=${encodeURIComponent(text)}&key=Insanity31`);
 
@@ -45,7 +45,7 @@ const pinterest = async (m, { conn, text, usedPrefix, command }) => {
         const data = await res.json();
 
         if (!data.status || data.status !== true || !Array.isArray(data.data) || data.data.length < 2) {
-            return conn.reply(m.chat, '✎ No se encontraron suficientes imágenes para un álbum.', m, global.rcanal);
+            return m.reply('✎ No se encontraron suficientes imágenes para un álbum.');
         }
 
         const images = data.data.slice(0, 10).map(img => ({
@@ -59,7 +59,7 @@ const pinterest = async (m, { conn, text, usedPrefix, command }) => {
     } catch (error) {
         console.error('Error en pinterest:', error);
         await m.react('❌');
-        conn.reply(m.chat, '✎ Hubo un error al obtener las imágenes de Pinterest.', m, global.rcanal);
+        m.reply(`✎ Hubo un error: ${error.message}`);
     }
 };
 
