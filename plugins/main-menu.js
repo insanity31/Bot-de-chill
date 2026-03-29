@@ -67,7 +67,7 @@ ${seccionesTexto}
         await conn.sendMessage(m.chat, {
             document: buffer,
             mimetype: 'application/pdf',
-            fileName: `『 Zero Two Menu 』.pdf`,
+            fileName: `『 Insanity  Menu 』.pdf`,
             fileLength: 2199023255552,
             pageCount: 2026,
             caption: menuTexto,
@@ -93,7 +93,7 @@ ${seccionesTexto}
 
     } catch (e) {
         console.error(e)
-        m.reply('😐 Darling, algo salió mal al generar el menú... prueba de nuevo')
+        m.reply('😐 Bro, algo salió mal al generar el menú... prueba de nuevo')
     }
 }
 
