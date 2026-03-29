@@ -33,8 +33,8 @@ async function sendAlbumMessage(conn, jid, medias, options = {}) {
     return album;
 }
 
-const pinterest = async (m, { conn, text, command }) => {
-    if (!text) return m.reply(`✎ Uso Correcto: \n> -${command} Goku`);
+const pinterest = async (m, { conn, text }) => {
+    if (!text) return m.reply(`✎ Uso Correcto: \n> -pinterest Goku`);
     await m.react('⏳');
     m.reply('✎ Descargando imágenes de Pinterest...');
     try {
@@ -43,6 +43,7 @@ const pinterest = async (m, { conn, text, command }) => {
         if (!res.ok) throw new Error(`Error en la API: ${res.status} ${res.statusText}`);
 
         const data = await res.json();
+        m.reply(JSON.stringify(data).slice(0, 500))
 
         if (!data.status || data.status !== true || !Array.isArray(data.data) || data.data.length < 2) {
             return m.reply('✎ No se encontraron suficientes imágenes para un álbum.');
