@@ -75,7 +75,7 @@ let handler = async (m, { conn, args, prefix }) => {
             data: { url: img.hd }
         }))
 
-        const caption = `👻 *Resultados para:* ${text}\n👻 *goku*`
+        const caption = `👻 *Resultados para:* ${text}\n👻 *GG*`
         await sendAlbumMessage(conn, m.chat, images, { caption, quoted: m })
         await m.react('✅')
     } catch (error) {
