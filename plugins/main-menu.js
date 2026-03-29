@@ -1,15 +1,17 @@
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { database } from '../lib/database.js'
+import { pathToFileURL } from 'url'
 
 const handler = async (m, { conn }) => {
     try {
         const botname = global.botname || global.botName || 'Zero Two'
         const pluginFiles = fs.readdirSync('./plugins').filter(file => file.endsWith('.js'))
         const grouped = {}
+
         for (const file of pluginFiles) {
             try {
-                const plugin = (await import(`../plugins/${file}`)).default
+                const plugin = (await import(pathToFileURL(`./plugins/${file}`).href)).default
                 const tags = plugin?.tags || ['misc']
                 const cmd = plugin?.command?.[0] || file.replace('.js', '')
                 for (const tag of tags) {
@@ -27,15 +29,13 @@ const handler = async (m, { conn }) => {
         const totalUsers = Object.keys(database.data.users || {}).length
         const registeredUsers = Object.values(database.data.users || {}).filter(u => u.registered).length
 
-        let seccionesTexto = Object.entries(grouped).map(([tag, cmds]) =>
-`𖤐 *${tag.toUpperCase()}*
-${cmds.map(c => `  ꕦ ${c}`).join('\n')}
-`
+        const seccionesTexto = Object.entries(grouped).map(([tag, cmds]) =>
+`𖤐 *${tag.toUpperCase()}*\n${cmds.map(c => `  ꕦ ${c}`).join('\n')}\n`
         ).join('\n')
 
-        const zonaHoraria = 'America/Venezuela'
-        const ahora = new Date()
-        const hora = parseInt(ahora.toLocaleTimeString('es-CO', { timeZone: zonaHoraria, hour: '2-digit', hour12: false }))
+        const zonaHoraria = 'America/Bogota'
+        const hora = parseInt(new Date().toLocaleTimeString('es-CO', { timeZone: zonaHoraria, hour: '2-digit', hour12: false }))
+
         let saludo, carita
         if (hora >= 5 && hora < 12) {
             saludo = 'buenos días'
@@ -48,18 +48,20 @@ ${cmds.map(c => `  ꕦ ${c}`).join('\n')}
             carita = '(◕‿◕✿) 🌙'
         }
 
-        let menuTexto = `𖤐 ❖ 404_ℐ𝓃𝓈𝒶𝓃𝒾𝓉𝓎_ℬℴ𝓉  𝐌𝐄𝐍𝐔 ❖ 𖤐
+        const menuTexto = `𖤐 ❖ 404_ℐ𝓃𝓈𝒶𝓃𝒾𝓉𝓎_ℬℴ𝓉  𝐌𝐄𝐍𝐔 ❖ 𖤐
 ❝ ¡Hola *${m.pushName}*, ${saludo}~! ${carita}
 Soy *${botname}* y este es mi menú,
 más te vale usarlo bien... ehh🗿 ❞
 ꙮ *Comandos:* ${totalCmds} disponibles
 ꙮ *Usuarios:* ${totalUsers} conocidos
 ꙮ *Registrados:* ${registeredUsers} darlings
+
 ${seccionesTexto}
 𖤐 *insanity bot* 🎭 (´｡• ᵕ •｡\`)`.trim()
 
         const response = await fetch('https://causas-files.vercel.app/fl/d3tg.jpg')
-        const buffer = await response.buffer()
+        const arrayBuffer = await response.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
         const base64 = buffer.toString('base64')
 
         await conn.sendMessage(m.chat, {
