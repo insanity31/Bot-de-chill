@@ -60,7 +60,7 @@ let handler = async (m, { conn, args, prefix }) => {
     await m.reply('👻 Buscando imágenes en Pinterest, espera un momento~')
 
     try {
-        const res = await fetch(`https://api.alyacore.xyz/search/pinterest?query=${encodeURIComponent(text)}&key=insanity31-404top`)
+        const res = await fetch(`https://api.alyacore.xyz/search/pinterest?query=${encodeURIComponent(text)}&key=insanity31`)
 
         if (!res.ok) throw new Error(`Error en la API: ${res.status} ${res.statusText}`)
 
