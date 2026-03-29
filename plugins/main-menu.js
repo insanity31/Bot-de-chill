@@ -33,7 +33,7 @@ ${cmds.map(c => `  ꕦ ${c}`).join('\n')}
 `
         ).join('\n')
 
-        const zonaHoraria = 'America/Bogota'
+        const zonaHoraria = 'America/Venezuela'
         const ahora = new Date()
         const hora = parseInt(ahora.toLocaleTimeString('es-CO', { timeZone: zonaHoraria, hour: '2-digit', hour12: false }))
         let saludo, carita
@@ -48,17 +48,17 @@ ${cmds.map(c => `  ꕦ ${c}`).join('\n')}
             carita = '(◕‿◕✿) 🌙'
         }
 
-        let menuTexto = `𖤐 ❖ 𝐙𝐄𝐑𝐎 𝐓𝐖𝐎'𝐒 𝐌𝐄𝐍𝐔 ❖ 𖤐
+        let menuTexto = `𖤐 ❖ 404_ℐ𝓃𝓈𝒶𝓃𝒾𝓉𝓎_ℬℴ𝓉  𝐌𝐄𝐍𝐔 ❖ 𖤐
 ❝ ¡Hola *${m.pushName}*, ${saludo}~! ${carita}
 Soy *${botname}* y este es mi menú,
-más te vale usarlo bien... hmph 💗 ❞
+más te vale usarlo bien... ehh🗿 ❞
 ꙮ *Comandos:* ${totalCmds} disponibles
 ꙮ *Usuarios:* ${totalUsers} conocidos
 ꙮ *Registrados:* ${registeredUsers} darlings
 ${seccionesTexto}
-𖤐 *~Zero Two* 🌸 (´｡• ᵕ •｡\`)`.trim()
+𖤐 *insanity bot* 🎭 (´｡• ᵕ •｡\`)`.trim()
 
-        const response = await fetch('https://causas-files.vercel.app/fl/9vs2.jpg')
+        const response = await fetch('https://causas-files.vercel.app/fl/d3tg.jpg')
         const buffer = await response.buffer()
         const base64 = buffer.toString('base64')
 
@@ -74,8 +74,8 @@ ${seccionesTexto}
                 isForwarded: true,
                 forwardingScore: 999,
                 externalAdReply: {
-                    title: '𝐙𝐄𝐑𝐎 𝐓𝐖𝐎',
-                    body: 'darling~ 💗',
+                    title: '404_ℐ𝓃𝓈𝒶𝓃𝒾𝓉𝓎_ℬℴ𝓉 ',
+                    body: 'locura 🎭',
                     mediaType: 1,
                     thumbnail: base64,
                     renderLargerThumbnail: true,
@@ -83,7 +83,7 @@ ${seccionesTexto}
                 },
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363404822730259@newsletter',
-                    newsletterName: '𝐙𝐄𝐑𝐎 𝐓𝐖𝐎',
+                    newsletterName: 'insanity bot',
                     serverMessageId: -1
                 }
             }
@@ -91,7 +91,7 @@ ${seccionesTexto}
 
     } catch (e) {
         console.error(e)
-        m.reply('💔 Darling, algo salió mal al generar el menú... prueba de nuevo~')
+        m.reply('😐 Darling, algo salió mal al generar el menú... prueba de nuevo')
     }
 }
 
