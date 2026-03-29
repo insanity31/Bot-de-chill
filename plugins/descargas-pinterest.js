@@ -33,7 +33,8 @@ async function sendAlbumMessage(conn, jid, medias, options = {}) {
     return album;
 }
 
-const pinterest = async (m, { conn, text }) => {
+const pinterest = async (m, { conn, args }) => {
+    const text = args?.join(' ')
     if (!text) return m.reply(`✎ Uso Correcto: \n> -pinterest Goku`);
     await m.react('⏳');
     m.reply('✎ Descargando imágenes de Pinterest...');
