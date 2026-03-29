@@ -33,7 +33,7 @@ const handler = async (m, { conn }) => {
 `𖤐 *${tag.toUpperCase()}*\n${cmds.map(c => `  ꕦ ${c}`).join('\n')}\n`
         ).join('\n')
 
-        const zonaHoraria = 'America/Bogota'
+        const zonaHoraria = 'America/Caracas'
         const hora = parseInt(new Date().toLocaleTimeString('es-CO', { timeZone: zonaHoraria, hour: '2-digit', hour12: false }))
 
         let saludo, carita
@@ -42,7 +42,7 @@ const handler = async (m, { conn }) => {
             carita = '(＊^▽^＊) ☀️'
         } else if (hora >= 12 && hora < 18) {
             saludo = 'buenas tardes'
-            carita = '(｡•̀ᴗ-)✧ 🌸'
+            carita = '(｡•̀ᴗ-)✧ 🕒'
         } else {
             saludo = 'buenas noches'
             carita = '(◕‿◕✿) 🌙'
@@ -54,7 +54,7 @@ Soy *${botname}* y este es mi menú,
 más te vale usarlo bien... ehh🗿 ❞
 ꙮ *Comandos:* ${totalCmds} disponibles
 ꙮ *Usuarios:* ${totalUsers} conocidos
-ꙮ *Registrados:* ${registeredUsers} darlings
+ꙮ *Registrados:* ${registeredUsers} loquitos
 
 ${seccionesTexto}
 𖤐 *insanity bot* 🎭 (´｡• ᵕ •｡\`)`.trim()
