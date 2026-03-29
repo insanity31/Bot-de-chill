@@ -44,7 +44,6 @@ const pinterest = async (m, { conn, args }) => {
         if (!res.ok) throw new Error(`Error en la API: ${res.status} ${res.statusText}`);
 
         const data = await res.json();
-        m.reply(JSON.stringify(data).slice(0, 500))
 
         if (!data.status || data.status !== true || !Array.isArray(data.data) || data.data.length < 2) {
             return m.reply('✎ No se encontraron suficientes imágenes para un álbum.');
