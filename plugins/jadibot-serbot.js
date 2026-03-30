@@ -117,10 +117,7 @@ const handler = async (m, { conn, args, prefix }) => {
                     secret = secret?.match(/.{1,4}/g)?.join('-') || secret
 
                     const msgCode = await conn.sendMessage(m.chat, {
-                        text:
-                            `${global.vs}\n\n` +
-                            `  ◆ Tu código › *${secret}*\n\n` +
-                            `  ◇ Expira en 60 segundos`
+                        text: secret
                     }, { quoted: msgInstructions ?? m })
 
                     if (msgCode?.key) {
