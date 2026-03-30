@@ -14,7 +14,7 @@ function msToUptime(ms) {
 
 function isSocketReady(sock) {
   if (!sock) return false
-  return sock.ws?.socket?.readyState === 1 && !!sock.user?.jid
+  return !!sock.user?.jid
 }
 
 function getPhone(jid) {
@@ -28,11 +28,11 @@ const handler = async (m, { conn, isOwner }) => {
   const active = (global.conns || []).filter(c => isSocketReady(c))
 
   if (active.length === 0) {
-    return m.reply(`✦ Zero Two\n\n  ◇ No hay SubBots conectados actualmente.`)
+    return m.reply(`${global.vs}\n\n  ◇ No hay SubBots conectados actualmente.`)
   }
 
   const now = Date.now()
-  let lista = `✦ Zero Two\n\n  ◆ SubBots conectados › ${active.length}\n\n`
+  let lista = `${global.vs}\n\n  ◆ SubBots conectados › ${active.length}\n\n`
 
   active.forEach((sock, i) => {
     const nombre = sock.user?.name || sock.user?.verifiedName || 'Desconocido'
