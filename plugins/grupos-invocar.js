@@ -16,7 +16,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
             `¡Respondan rapido putas~ `
 
         await conn.sendMessage(m.chat, {
-            image: { url: 'https://causas-files.vercel.app/fl/xxbz.jpg' },
+            image: { url: 'https://causas-files.vercel.app/fl/awon.png' },
             caption: caption,
             mentions: participants
         }, { quoted: m })
