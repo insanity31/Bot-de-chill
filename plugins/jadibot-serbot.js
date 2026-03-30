@@ -155,18 +155,21 @@ const handler = async (m, { conn, args, prefix }) => {
             if (connection === 'close') {
                 global.conns = global.conns.filter(c => c.sessionPath !== sessionPath)
 
-                if ([
-                    DisconnectReason.connectionLost,
-                    DisconnectReason.connectionClosed,
-                    DisconnectReason.restartRequired,
-                    DisconnectReason.timedOut,
-                    DisconnectReason.badSession
-                ].includes(reason)) {
-                    global.startSubBot?.(sessionPath)
-                } else if ([DisconnectReason.loggedOut, DisconnectReason.forbidden].includes(reason)) {
+                if ([DisconnectReason.loggedOut, DisconnectReason.forbidden].includes(reason)) {
+                    // Sesión cerrada intencionalmente: borrar y notificar
                     fs.rmSync(sessionPath, { recursive: true, force: true })
+                    conn.sendMessage(m.chat, {
+                        text: `${global.vs}\n\n  ◇ SubBot desvinculado › +${targetPhone}\n  ✧ La sesión fue eliminada`
+                    }, { quoted: m }).catch(() => {})
+                } else if (reason === DisconnectReason.badSession) {
+                    // Sesión corrupta: borrar y pedir que vincule de nuevo
+                    fs.rmSync(sessionPath, { recursive: true, force: true })
+                    conn.sendMessage(m.chat, {
+                        text: `${global.vs}\n\n  ◇ Sesión corrupta › +${targetPhone}\n  ✧ Usa el comando code para vincular de nuevo`
+                    }, { quoted: m }).catch(() => {})
                 } else {
-                    global.startSubBot?.(sessionPath)
+                    // Cualquier otro error: reconectar con delay para evitar loop instantáneo
+                    setTimeout(() => global.startSubBot?.(sessionPath), 5000)
                 }
             }
         })
