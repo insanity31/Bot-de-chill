@@ -13,6 +13,9 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
             `🔥 *Anuncio:* ${anuncio}\n\n` +
             `${mentions,
+             mentions,
+             mentions,
+             mentions,
              mentions}\n\n` +
             `¡Respondan rapido putas~ `
 
@@ -22,7 +25,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
             mentions: participants
         }, { quoted: m })
 
-        await m.react('‼️')
+        await m.react('🗿')
 
     } catch (e) {
         console.error('❌ INVOCAR ERROR:', e)
