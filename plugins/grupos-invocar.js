@@ -7,8 +7,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
 
         const anuncio = args.join(' ') || '¡levantense 🗣️‼️🔥! '
 
-        const mentions = participants.map(p => `@${p.split('@,
-                                                           @')[0]}`).join(' ')
+        const mentions = participants.map(p => `@${p.split('@')[0]}`).join(' ')
 
         const caption =
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
@@ -17,7 +16,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
             `¡Respondan rapido putas~ `
 
         await conn.sendMessage(m.chat, {
-            image: { url: 'https://causas-files.vercel.app/fl/awon.png' },
+            image: { url: 'https://causas-files.vercel.app/fl/tlo3.jpg' },
             caption: caption,
             mentions: participants
         }, { quoted: m })
