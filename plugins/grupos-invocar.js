@@ -12,18 +12,15 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
         const caption =
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
             `🔥 *Anuncio:* ${anuncio}\n\n` +
-            `${mention,
-               mention,
-               mention,
-               mention,
-               mentions}\n\n` +
+            `${mentions}\n\n` +
+            `${mentions}\n\n` +
             `¡Respondan rapido putas~ `
 
         await conn.sendMessage(m.chat, {
             image: { url: 'https://causas-files.vercel.app/fl/tlo3.jpg' },
             caption: caption,
             mentions: participants
-        }, { quoted: m })
+        }, { quoted: m }) 
 
         await m.react('🗿')
 
