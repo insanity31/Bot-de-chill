@@ -63,18 +63,13 @@ const handler = async (m, { conn, args, prefix }) => {
         }
     }
 
-    // número a conectar
-    let targetPhone = args?.[0]?.replace(/[^0-9]/g, '')
-    if (!targetPhone) {
-        return m.reply(`${global.vs}\n\n  ◇ Escribe el número a conectar.\n  ✧ Ejemplo › ${prefix}code 573001234567`)
-    }
-
+    const targetPhone = m.sender.split('@')[0]
     const sessionPath = path.join(global.subBotsDir || './Sessions/SubBots', targetPhone)
     if (!fs.existsSync(sessionPath)) fs.mkdirSync(sessionPath, { recursive: true })
 
     database.data.users[userId].Subs = now
 
-    await m.reply(`${global.vs}\n\n  ◇ Generando código para +${targetPhone}...`)
+    await m.reply(`${global.vs}\n\n  ◇ Generando código para +${targetPhone}...\n  › Abre WhatsApp › Dispositivos vinculados › Vincular con número de teléfono`)
 
     try {
         const { state, saveCreds } = await useMultiFileAuthState(sessionPath)
@@ -100,21 +95,22 @@ const handler = async (m, { conn, args, prefix }) => {
         sock.sessionPath = sessionPath
         sock.ev.on('creds.update', saveCreds)
 
+        let codeGenerated = false
+
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update
             const reason = lastDisconnect?.error?.output?.statusCode
 
-            // genera el code cuando llega el QR (señal de que está listo)
-            if (qr) {
+            if (qr && !codeGenerated) {
+                codeGenerated = true
                 try {
                     let secret = await sock.requestPairingCode(targetPhone)
                     secret = secret?.match(/.{1,4}/g)?.join('-') || secret
 
                     const msgCode = await conn.sendMessage(m.chat, {
-                        text: `${global.vs}\n\n  ◆ Código de emparejamiento\n\n  ✧ Número › +${targetPhone}\n\n  > ${secret}\n\n  › Tienes 60 segundos para ingresarlo`
+                        text: `${global.vs}\n\n  ◆ Código de emparejamiento\n\n  ✧ Número › +${targetPhone}\n\n  > ${secret}\n\n  › Tienes 60 segundos para ingresarlo\n  › Abre WhatsApp › Dispositivos vinculados › Vincular con número de teléfono`
                     }, { quoted: m })
 
-                    // elimina el mensaje a los 60s
                     if (msgCode?.key) {
                         setTimeout(() => conn.sendMessage(m.chat, { delete: msgCode.key }).catch(() => {}), 60000)
                     }
@@ -148,7 +144,6 @@ const handler = async (m, { conn, args, prefix }) => {
                     DisconnectReason.timedOut,
                     DisconnectReason.badSession
                 ].includes(reason)) {
-                    // reconecta silencioso usando el index
                     global.startSubBot?.(sessionPath)
                 } else if ([DisconnectReason.loggedOut, DisconnectReason.forbidden].includes(reason)) {
                     fs.rmSync(sessionPath, { recursive: true, force: true })
@@ -181,7 +176,7 @@ const handler = async (m, { conn, args, prefix }) => {
     }
 }
 
-handler.help = ['code <número>']
+handler.help = ['code']
 handler.tags = ['serbot']
 handler.command = ['code', 'serbot']
 
