@@ -37,7 +37,6 @@ return conn.sendMessage(m.chat, { text: `👑 *ACCESO RESTRINGIDO*\nEste comando
 
 const allConns = global.conns || []
 
-const mainPhone = getPhone(botJid)
 const mainName = conn.user?.name || botName
 const mainUptime = process.uptime ? msToUptime(process.uptime() * 1000) : ':v'
 
@@ -46,7 +45,6 @@ let msg = `• ✦【 *Lista de Bots* 】✦ •
 
 > *Bot Principal*
 𝇈 *Nombre* » ${mainName}
-𝇈 *Número* » +${mainPhone}
 𝇈 *Uptime* » ${mainUptime}\n\n`
 if (allConns.length === 0) {
 msg += `\n> *Sub-bots*\n📍 No hay sub-bots conectados.`
@@ -54,14 +52,11 @@ msg += `\n> *Sub-bots*\n📍 No hay sub-bots conectados.`
 msg += `\n> *Sub-bots* (${allConns.length} total)\n`
 
 allConns.forEach((c, i) => {
-const jid = getBotJid(c)
-const phone = getPhone(jid)
 const name = getBotName(c) || `Bot ${i + 1}`
 const online = isConnected(c)
 const status = online ? 'Conectado' : 'Desconectado' //Depende si funciona
 const uptime = c?.startTime ? msToUptime(Date.now() - c.startTime) : ':v'
 msg += `\n𝇈 *${i + 1}.* ${name}\n` +
-`• *Número* » +${phone}\n` +
 `• *Estado* » ${status}\n` +
 `• *Uptime* » ${uptime || '---'}\n\n`
 })
