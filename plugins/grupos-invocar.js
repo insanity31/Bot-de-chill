@@ -7,7 +7,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
 
         const anuncio = args?.join(' ') || '¡levantense 🗣️‼️🔥!'
 
-        const mentions = participants.map(p => `👽 @${p.split('@')[0]}`).join('\n')
+        const mentions = participants.map(p => `🗣️ @${p.split('@')[0]}`).join('\n')
 
         const caption =
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
