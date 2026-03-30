@@ -11,20 +11,20 @@ let handler = async (m, { conn, args, prefix }) => {
     const zeroImg = 'https://causas-files.vercel.app/fl/9vs2.jpg'
 
     if (user.registered) return m.reply(
-        `💗 *¡Ya estás registrado, darling~!*\n\n🌸 Si quieres eliminar tu registro usa:\n*${prefix}unreg*`
+        `🗿 *Ya estás registrado we eres idiota?*\n\n 🎭 Si quieres eliminar tu registro usa:\n*${prefix}unreg*`
     )
 
     if (!Reg.test(text)) return m.reply(
-        `𖤐 *Registro - Zero Two* 🌸\n\n*Formato correcto:*\n${prefix}reg nombre.edad\n\n*Ejemplo:*\n${prefix}reg ${name2}.18\n\n💗 ¡Regístrate para usar todas mis funciones, darling~!`
+        `𖤐 *Registro - Zero Two* 🎭\n\n*Formato correcto:*\n${prefix}reg nombre.edad\n\n*Ejemplo:*\n${prefix}reg ${name2}.18\n\n 🗿 ¡Regístrate para usar todas mis funciones!`
     )
 
     let [_, name, age] = text.match(Reg)
-    if (!name) return m.reply('💔 El nombre no puede estar vacío, darling~')
-    if (!age) return m.reply('💔 La edad no puede estar vacía, darling~')
-    if (name.length >= 30) return m.reply('💔 El nombre es muy largo, darling~ Usa menos de 30 caracteres.')
+    if (!name) return m.reply('🗣️ El nombre no puede estar vacío pendejo, no es como si yo fuera a decir "oye ___ es gay"')
+    if (!age) return m.reply('😐 La edad no puede estar vacía')
+    if (name.length >= 30) return m.reply('😐 El nombre es muy largo Usa menos de 30 caracteres.')
     age = parseInt(age)
-    if (age > 100) return m.reply('💔 Esa edad es demasiado alta, darling~')
-    if (age < 10) return m.reply('💔 Eres muy pequeño para usar el bot, darling~')
+    if (age > 100) return m.reply('😐 Esa edad es demasiado alta, ni que fueras dinosaurio')
+    if (age < 10) return m.reply('😐 Eres muy pequeño para usar el bot pero no me importa, miente como ella a ti')
 
     user.name = name.trim()
     user.age = age
@@ -33,9 +33,9 @@ let handler = async (m, { conn, args, prefix }) => {
 
     const sn = createHash('md5').update(m.sender).digest('hex').slice(0, 20)
 
-    const regbot = `𖤐 *¡REGISTRO EXITOSO!* 🌸\n\n👤 *Nombre:* ${name}\n🎂 *Edad:* ${age} años\n🆔 *ID:* ${sn}\n\n💗 *¡Bienvenido/a, darling~!*\n\nHmph... más te vale usar el bot bien o no te lo perdonaré~ 💢`
+    const regbot = `𖤐 *¡REGISTRO EXITOSO!* 🎭\n\n👤 *Nombre:* ${name}\n🎂 *Edad:* ${age} años\n🆔 *ID:* ${sn}\n\n🎭 *¡Bienvenido/a, !*\n\nHmph... más te vale usar el bot bien o ban 💢`
 
-    await m.react('🌸')
+    await m.react('🎭')
 
     let thumbBuffer = null
     try {
@@ -49,8 +49,8 @@ let handler = async (m, { conn, args, prefix }) => {
         text: regbot,
         contextInfo: {
             externalAdReply: {
-                title: '𝐙𝐄𝐑𝐎 𝐓𝐖𝐎 - Registro 🌸',
-                body: 'darling~ 💗',
+                title: 'insanity×፝֟͜×♱卐 - Registro 🎭',
+                body: 'insanity 🎭',
                 thumbnail: thumbBuffer,
                 mediaType: 1,
                 renderLargerThumbnail: true
