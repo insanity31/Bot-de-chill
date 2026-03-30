@@ -69,7 +69,7 @@ const handler = async (m, { conn, args, prefix }) => {
 
     database.data.users[userId].Subs = now
 
-    await m.reply(`${global.vs}\n\n  ◇ Generando código para +${targetPhone}...\n  › Abre WhatsApp › Dispositivos vinculados › Vincular con número de teléfono`)
+    await m.reply(`${global.vs}\n\n  ◇ Generando código para +${targetPhone}...`)
 
     try {
         const { state, saveCreds } = await useMultiFileAuthState(sessionPath)
@@ -95,31 +95,40 @@ const handler = async (m, { conn, args, prefix }) => {
         sock.sessionPath = sessionPath
         sock.ev.on('creds.update', saveCreds)
 
-        let codeGenerated = false
-
-        sock.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect, qr } = update
-            const reason = lastDisconnect?.error?.output?.statusCode
-
-            if (qr && !codeGenerated) {
-                codeGenerated = true
-                try {
+        // pide el code a los 3s igual que el index
+        setTimeout(async () => {
+            try {
+                if (!state.creds.registered) {
                     let secret = await sock.requestPairingCode(targetPhone)
                     secret = secret?.match(/.{1,4}/g)?.join('-') || secret
 
                     const msgCode = await conn.sendMessage(m.chat, {
-                        text: `${global.vs}\n\n  ◆ Código de emparejamiento\n\n  ✧ Número › +${targetPhone}\n\n  > ${secret}\n\n  › Tienes 60 segundos para ingresarlo\n  › Abre WhatsApp › Dispositivos vinculados › Vincular con número de teléfono`
+                        text:
+                            `${global.vs}\n\n` +
+                            `  ◆ Código de emparejamiento\n\n` +
+                            `  ✧ Número › +${targetPhone}\n\n` +
+                            `  > ${secret}\n\n` +
+                            `  › Abre WhatsApp\n` +
+                            `  › Toca los tres puntos\n` +
+                            `  › Dispositivos vinculados\n` +
+                            `  › Vincular con número de teléfono\n` +
+                            `  › Ingresa el código de arriba\n\n` +
+                            `  ◇ Expira en 60 segundos`
                     }, { quoted: m })
 
                     if (msgCode?.key) {
                         setTimeout(() => conn.sendMessage(m.chat, { delete: msgCode.key }).catch(() => {}), 60000)
                     }
-                } catch (e) {
-                    console.error('Error generando code:', e.message)
-                    await m.reply(`${global.vs}\n\n  ◇ Error al generar código › ${e.message}`)
                 }
-                return
+            } catch (e) {
+                console.error('Error generando code:', e.message)
+                await m.reply(`${global.vs}\n\n  ◇ Error al generar código › ${e.message}`)
             }
+        }, 3000)
+
+        sock.ev.on('connection.update', async (update) => {
+            const { connection, lastDisconnect } = update
+            const reason = lastDisconnect?.error?.output?.statusCode
 
             if (connection === 'open') {
                 sock.startTime = Date.now()
@@ -130,7 +139,12 @@ const handler = async (m, { conn, args, prefix }) => {
                 global.conns.push(sock)
 
                 await conn.sendMessage(m.chat, {
-                    text: `${global.vs}\n\n  ◆ Conexión exitosa\n  ✧ Usuario › ${sock.user?.name || targetPhone}\n  ✧ Subbots activos › ${global.conns.length}`
+                    text:
+                        `${global.vs}\n\n` +
+                        `  ◆ Conexión exitosa\n\n` +
+                        `  ✧ Usuario › ${sock.user?.name || targetPhone}\n` +
+                        `  ✧ Número › +${targetPhone}\n` +
+                        `  ✧ Subbots activos › ${global.conns.length}`
                 }, { quoted: m }).catch(() => {})
             }
 
