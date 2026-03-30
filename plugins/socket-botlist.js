@@ -1,5 +1,7 @@
 import chalk from 'chalk'
 
+if (!Array.isArray(global.conns)) global.conns = []
+
 function msToUptime(ms) {
   const seconds = Math.floor((ms / 1000) % 60)
   const minutes = Math.floor((ms / (1000 * 60)) % 60)
@@ -12,11 +14,6 @@ function msToUptime(ms) {
   return `${seconds}s`
 }
 
-function isSocketReady(sock) {
-  if (!sock) return false
-  return !!sock.user?.jid
-}
-
 function getPhone(jid) {
   if (!jid) return null
   return jid.split('@')[0].split(':')[0]
@@ -25,7 +22,7 @@ function getPhone(jid) {
 const handler = async (m, { conn, isOwner }) => {
   if (!isOwner) return m.reply('👑 *ACCESO RESTRINGIDO*\nEste comando solo puede ser ejecutado por mi creador.')
 
-  const active = (global.conns || []).filter(c => isSocketReady(c))
+  const active = global.conns.filter(c => c?.user?.jid)
 
   if (active.length === 0) {
     return m.reply(`${global.vs}\n\n  ◇ No hay SubBots conectados actualmente.`)
