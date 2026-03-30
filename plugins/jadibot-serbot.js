@@ -95,7 +95,21 @@ const handler = async (m, { conn, args, prefix }) => {
         sock.sessionPath = sessionPath
         sock.ev.on('creds.update', saveCreds)
 
-        // pide el code a los 3s igual que el index
+        // Envía primero las instrucciones
+        const msgInstructions = await conn.sendMessage(m.chat, {
+            text:
+                `${global.vs}\n\n` +
+                `  ◆ Código de emparejamiento\n\n` +
+                `  ✧ Número › +${targetPhone}\n\n` +
+                `  › Abre WhatsApp\n` +
+                `  › Toca los tres puntos\n` +
+                `  › Dispositivos vinculados\n` +
+                `  › Vincular con número de teléfono\n` +
+                `  › Ingresa el código que llegará abajo\n\n` +
+                `  ◇ Generando código...`
+        }, { quoted: m }).catch(() => null)
+
+        // Pide el code a los 3s y lo manda en mensaje separado (abajo)
         setTimeout(async () => {
             try {
                 if (!state.creds.registered) {
@@ -105,16 +119,9 @@ const handler = async (m, { conn, args, prefix }) => {
                     const msgCode = await conn.sendMessage(m.chat, {
                         text:
                             `${global.vs}\n\n` +
-                            `  ◆ Código de emparejamiento\n\n` +
-                            `  ✧ Número › +${targetPhone}\n\n` +
-                            `  > ${secret}\n\n` +
-                            `  › Abre WhatsApp\n` +
-                            `  › Toca los tres puntos\n` +
-                            `  › Dispositivos vinculados\n` +
-                            `  › Vincular con número de teléfono\n` +
-                            `  › Ingresa el código de arriba\n\n` +
+                            `  ◆ Tu código › *${secret}*\n\n` +
                             `  ◇ Expira en 60 segundos`
-                    }, { quoted: m })
+                    }, { quoted: msgInstructions ?? m })
 
                     if (msgCode?.key) {
                         setTimeout(() => conn.sendMessage(m.chat, { delete: msgCode.key }).catch(() => {}), 60000)
