@@ -12,9 +12,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
         const caption =
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
             `🔥 *Anuncio:* ${anuncio}\n\n` +
-            `${mention}\n\n` +
-            `${mention}\n\n` +
-            `${mention}\n\n` +
+            `${mentions}\n\n` +
             `¡Respondan rapido putas~ `
 
         await conn.sendMessage(m.chat, {
