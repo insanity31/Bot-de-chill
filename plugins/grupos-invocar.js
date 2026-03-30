@@ -5,21 +5,21 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
         const group = await conn.groupMetadata(m.chat)
         const participants = group.participants.map(p => p.jid || p.id.split(':')[0] + '@s.whatsapp.net')
 
-        const anuncio = args.join(' ') || '¡levantense 🗣️‼️🔥! '
+        const anuncio = args?.join(' ') || '¡levantense 🗣️‼️🔥!'
 
-        const mentions = participants.map(p => `@${p.split('@')[0]}`).join(' ')
+        const mentions = participants.map(p => `👽 @${p.split('@')[0]}`).join('\n')
 
         const caption =
             `🔥 *¡ INVOCANDO A TODO EL GRUPO!* 🔥\n\n` +
             `🔥 *Anuncio:* ${anuncio}\n\n` +
             `${mentions}\n\n` +
-            `¡Respondan rapido putas~ `
+            `¡Respondan rapido putas~`
 
         await conn.sendMessage(m.chat, {
             image: { url: 'https://causas-files.vercel.app/fl/tlo3.jpg' },
             caption: caption,
             mentions: participants
-        }, { quoted: m }) 
+        }, { quoted: m })
 
         await m.react('🗿')
 
@@ -32,7 +32,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
 
 handler.help = ['invocar', 'invocar <texto>']
 handler.tags = ['group']
-handler.command = ['invocar', 'invocarwaifu']
+handler.command = ['invocar']
 handler.group = true
 handler.admin = true
 
