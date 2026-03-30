@@ -8,7 +8,7 @@ let handler = async (m, { conn, args, prefix }) => {
     const text = args.join(' ')
     const user = database.data.users[m.sender]
     const name2 = m.pushName || 'Darling'
-    const zeroImg = 'https://causas-files.vercel.app/fl/9vs2.jpg'
+    const zeroImg = 'https://causas-files.vercel.app/fl/lo7l.jpg'
 
     if (user.registered) return m.reply(
         `🗿 *Ya estás registrado we eres idiota?*\n\n 🎭 Si quieres eliminar tu registro usa:\n*${prefix}unreg*`
@@ -33,7 +33,7 @@ let handler = async (m, { conn, args, prefix }) => {
 
     const sn = createHash('md5').update(m.sender).digest('hex').slice(0, 20)
 
-    const regbot = `𖤐 *¡REGISTRO EXITOSO!* 🎭\n\n👤 *Nombre:* ${name}\n🎂 *Edad:* ${age} años\n🆔 *ID:* ${sn}\n\n🎭 *¡Bienvenido/a, !*\n\nHmph... más te vale usar el bot bien o ban 💢`
+    const regbot = `𖤐 *¡REGISTRO EXITOSO!* 🎭\n\n👤 *Nombre:* ${name}\n🎂 *Edad:* ${age} años\n🆔 *ID:* ${sn}\n\n🎭 *¡Bienvenido/a, !*\n\n más te vale usar el bot bien modofoko o se viene ban 💢`
 
     await m.react('🎭')
 
