@@ -475,5 +475,3 @@ ${stack}
         if (m?.reply) {
             m.reply(`❌ *ERROR GLOBAL*\n\n🧾 ${msg.slice(0,400)}`)
         }
-
-    }
