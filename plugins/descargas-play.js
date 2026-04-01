@@ -33,7 +33,7 @@ const handler = async (msg, { conn, args, usedPrefix, command }) => {
 
     const api = `https://nex-magical.vercel.app/download/y?url=${encodeURIComponent(url)}`
     const { data } = await axios.get(api)
-
+   const API KEY='NEX-CFD4919237E44CED8AF33065'
     if (!data?.status || !data?.result?.status || !data?.result?.url)
       throw new Error('Error en descarga.')
 
