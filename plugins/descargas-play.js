@@ -1,5 +1,8 @@
 import axios from 'axios'
-import yts from 'yt-search'   // ← Agregado aquí
+import yts from 'yt-search'
+
+// 👇 PON TU API KEY AQUÍ AL PRINCIPIO
+const API_KEY = 'NEX-CFD4919237E44CED8AF33065'
 
 const handler = async (msg, { conn, args, usedPrefix, command }) => {
   const query = args.join(' ').trim()
@@ -31,9 +34,10 @@ const handler = async (msg, { conn, args, usedPrefix, command }) => {
 
     const url = search.videos[0].url
 
-    const api = `https://nex-magical.vercel.app/download/y?url=${encodeURIComponent(url)}`
+    // Usar la variable de arriba
+    const api = `https://nex-magical.vercel.app/download/y?url=${encodeURIComponent(url)}&key=${API_KEY}`
     const { data } = await axios.get(api)
-   const API KEY='NEX-CFD4919237E44CED8AF33065'
+
     if (!data?.status || !data?.result?.status || !data?.result?.url)
       throw new Error('Error en descarga.')
 
@@ -69,4 +73,4 @@ export default handler
 
 function sanitizeFilename(name = 'audio') {
   return name.replace(/[\\/:*?"<>|]+/g, '').trim().slice(0, 100)
-}
+                                                                                    }
