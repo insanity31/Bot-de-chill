@@ -1,4 +1,4 @@
-import { database } from './lib/database.js'
+import { database } from '../lib/database.js'
 
 let handler = async (m, { conn, args, prefix, command, isOwner }) => {
 
