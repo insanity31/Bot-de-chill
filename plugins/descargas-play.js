@@ -35,7 +35,7 @@ const handler = async (msg, { conn, args, usedPrefix, command }) => {
     const url = search.videos[0].url
 
     // Usar la variable de arriba
-    const api = `https://nex-magical.vercel.app/download/y?url=${encodeURIComponent(url)}&key=${API_KEY}'
+    const api = `https://nex-magical.vercel.app/download/audio?url=${encodeURIComponent(url)}&key=${API_KEY}'
     const { data } = await axios.get(api)
 
     if (!data?.status || !data?.result?.status || !data?.result?.url)
