@@ -12,8 +12,9 @@ const dev = "insanity31"
 
 const handler = async (m, { conn, text, command }) => {
   try {
-    if (!text.trim()) {
-      return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video." }, { quoted: m })
+    // ✅ CORRECCIÓN APLICADA - Ahora verifica si text existe antes de hacer trim
+    if (!text || !text.trim()) {
+      return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video.\n\n📌 Ejemplo: .play Bad Bunny" }, { quoted: m })
     }
 
     const user = global.db.data.users[m.sender]
@@ -171,4 +172,4 @@ async function getBuffer(url) {
   const res = await fetch(url)
   const buffer = await res.buffer()
   return buffer
-                           }
+  }
