@@ -1,76 +1,166 @@
-import axios from 'axios'
-import yts from 'yt-search'
+import fetch from "node-fetch"
+import yts from "yt-search"
 
-// 👇 PON TU API KEY AQUÍ AL PRINCIPIO
-const API_KEY = 'NEX-CFD4919237E44CED8AF33065'
+const API_KEY = "Zyzz-1234"
+const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
+const COST = 10
+const MAX_AUDIO = 16 * 1024 * 1024  // 16MB
+const MAX_VIDEO = 64 * 1024 * 1024  // 64MB
 
-const handler = async (msg, { conn, args, usedPrefix, command }) => {
-  const query = args.join(' ').trim()
-
-  if (!query) {
-    await conn.sendMessage(
-      msg.chat,
-      { text: `❌ *Error:*\n> Debes escribir el nombre del video.` },
-      { quoted: msg }
-    )
-
-    return conn.sendMessage(
-      msg.chat,
-      { text: `✳️ Usa:\n${usedPrefix} play <nombre del audio>` },
-      { quoted: msg }
-    )
-  }
-
-  await conn.sendMessage(
-    msg.chat,
-    { text: '*🎧 Descargando audio...*' },
-    { quoted: msg }
-  )
-
+const handler = async (m, { conn, text, command }) => {
   try {
-    const search = await yts(query)
-    if (!search.videos?.length)
-      throw new Error('No se encontró el audio.')
+    if (!text.trim()) {
+      return conn.reply(m.chat, "⚽ Ingresa el nombre o enlace del video.", m)
+    }
 
-    const url = search.videos[0].url
+    const user = global.db.data.users[m.sender]
 
-    // Usar la variable de arriba
-    const api = `https://nex-magical.vercel.app/download/audio?url=${encodeURIComponent(url)}&key=${API_KEY}'
-    const { data } = await axios.get(api)
+    if ((user.coin || 0) < COST) {
+      const faltante = COST - (user.coin || 0)
+      return conn.reply(
+        m.chat,
+        `⚽ No tienes suficientes monedas.\n\n💎 Necesitas: *${COST}*\n💎 Tienes: *${user.coin || 0}*\n💎 Te faltan: *${faltante}*`,
+        m
+      )
+    }
 
-    if (!data?.status || !data?.result?.status || !data?.result?.url)
-      throw new Error('Error en descarga.')
+    let videoIdToFind = text.match(youtubeRegexID)
+    let ytSearch = await yts(videoIdToFind ? "https://youtu.be/" + videoIdToFind[1] : text)
 
-    const title =
-      data.result.info?.title ||
-      search.videos[0]?.title ||
-      'audio'
+    if (videoIdToFind) {
+      ytSearch =
+        ytSearch.all.find(v => v.videoId === videoIdToFind[1]) ||
+        ytSearch.videos.find(v => v.videoId === videoIdToFind[1])
+    }
 
-    await conn.sendMessage(
-      msg.chat,
+    ytSearch = ytSearch.all?.[0] || ytSearch.videos?.[0] || ytSearch
+    if (!ytSearch) return conn.reply(m.chat, "✧ No se encontraron resultados.", m)
+
+    const { title, thumbnail, timestamp, views, ago, url } = ytSearch
+    const vistas = formatViews(views)
+
+    const thumb = thumbnail ? await getBuffer(thumbnail) : null
+
+    const type = ["play", "yta", "ytmp3", "playaudio"].includes(command) ? "audio" : "video"
+
+    await conn.reply(
+      m.chat,
+      `⚽ 𝗬𝗼𝘂𝗧𝘂𝗯𝗲 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱\n> 🎬 *${title}*\n> 👁️ *${vistas}*\n> ⏱️ *${timestamp}*\n> 📅 *${ago}*\n\n⚽ Procesando archivo...`,
+      m,
       {
-        audio: { url: data.result.url },
-        mimetype: 'audio/mpeg',
-        fileName: `${sanitizeFilename(title)}.mp3`
-      },
-      { quoted: msg }
+        contextInfo: {
+          externalAdReply: {
+            title: botname,
+            body: dev,
+            mediaType: 1,
+            mediaUrl: url,
+            sourceUrl: url,
+            thumbnail: thumb,
+            renderLargerThumbnail: true
+          }
+        }
+      }
     )
 
-  } catch (e) {
-    await conn.sendMessage(
-      msg.chat,
-      { text: `❌ Error:\n${e.message}` },
-      { quoted: msg }
+    const api = `https://rest.apicausas.xyz/api/v1/descargas/youtube?url=${encodeURIComponent(url)}&type=${type}&apikey=${API_KEY}`
+
+    const res = await fetch(api)
+    const json = await res.json()
+
+    if (!json?.status || !json?.data?.download?.url) {
+      throw new Error("No se pudo descargar el archivo")
+    }
+
+    const dlUrl = json.data.download.url
+
+    // Verificar tamaño real del archivo
+    let fileSize = 0
+    try {
+      const headRes = await fetch(dlUrl, { method: 'HEAD' })
+      fileSize = parseInt(headRes.headers.get('content-length') || '0')
+    } catch (_) {}
+
+    if (type === "audio") {
+      if (fileSize > MAX_AUDIO) {
+        // Mandar como documento si supera el límite
+        await conn.sendMessage(
+          m.chat,
+          {
+            document: { url: dlUrl },
+            fileName: `${title}.mp3`,
+            mimetype: "audio/mpeg"
+          },
+          { quoted: m }
+        )
+      } else {
+        await conn.sendMessage(
+          m.chat,
+          {
+            audio: { url: dlUrl },
+            fileName: `${title}.mp3`,
+            mimetype: "audio/mpeg",
+            ptt: false
+          },
+          { quoted: m }
+        )
+      }
+    } else {
+      if (fileSize > MAX_VIDEO) {
+        // Mandar como documento si supera el límite
+        await conn.sendMessage(
+          m.chat,
+          {
+            document: { url: dlUrl },
+            fileName: `${title}.mp4`,
+            mimetype: "video/mp4"
+          },
+          { quoted: m }
+        )
+      } else {
+        await conn.sendMessage(
+          m.chat,
+          {
+            document: { url: dlUrl },
+            fileName: `${title}.mp4`,
+            mimetype: "video/mp4"
+          },
+          { quoted: m }
+        )
+      }
+    }
+
+    user.coin = (user.coin || 0) - COST
+
+    await conn.reply(
+      m.chat,
+      `⚽ Descarga completada.\n💎 Se descontaron *${COST}* monedas.\n💎 Cartera actual: *${user.coin}*`,
+      m
     )
+  } catch (e) {
+    conn.reply(m.chat, `⚠︎ Error: ${e.message}`, m)
   }
 }
 
-handler.help = ['play <título>', 'ytmp3 <título>']
-handler.tags = ['download']
-handler.command = ['play', 'ytamp3']
+handler.command = handler.help = [
+  "play",
+  "yta",
+  "ytmp3",
+  "playaudio",
+  "play2",
+  "ytv",
+  "ytmp4"
+]
+handler.tags = ["descargas"]
+handler.group = true
+handler.reg = true
 
 export default handler
 
-function sanitizeFilename(name = 'audio') {
-  return name.replace(/[\\/:*?"<>|]+/g, '').trim().slice(0, 100)
-                                                                                    }
+function formatViews(views) {
+  if (!views) return "No disponible"
+  if (views >= 1e9) return `${(views / 1e9).toFixed(1)}B`
+  if (views >= 1e6) return `${(views / 1e6).toFixed(1)}M`
+  if (views >= 1e3) return `${(views / 1e3).toFixed(1)}k`
+  return views.toString()
+                       }
+        
