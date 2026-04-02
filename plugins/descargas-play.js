@@ -4,15 +4,18 @@ import yts from "yt-search"
 const API_KEY = "Nose-xd"
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 const COST = 10
-const MAX_AUDIO = 16 * 1024 * 1024  // 16MB
-const MAX_VIDEO = 64 * 1024 * 1024  // 64MB
+const MAX_AUDIO = 16 * 1024 * 1024
+const MAX_VIDEO = 64 * 1024 * 1024
 
 const botname = "insanity bot"
 const dev = "insanity31"
 
-const handler = async (m, { conn, text, command }) => {
+// ✅ CORREGIDO - text se extrae de m, no viene como parámetro
+const handler = async (m, { conn, command }) => {
+  // Obtener el texto del mensaje correctamente
+  const text = m.text || m.message?.conversation || m.message?.extendedTextMessage?.text || ""
+  
   try {
-    // ✅ CORRECCIÓN APLICADA - Ahora verifica si text existe antes de hacer trim
     if (!text || !text.trim()) {
       return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video.\n\n📌 Ejemplo: .play Bad Bunny" }, { quoted: m })
     }
@@ -77,7 +80,6 @@ const handler = async (m, { conn, text, command }) => {
 
     const dlUrl = json.data.download.url
 
-    // Verificar tamaño real del archivo
     let fileSize = 0
     try {
       const headRes = await fetch(dlUrl, { method: 'HEAD' })
@@ -86,7 +88,6 @@ const handler = async (m, { conn, text, command }) => {
 
     if (type === "audio") {
       if (fileSize > MAX_AUDIO) {
-        // Mandar como documento si supera el límite
         await conn.sendMessage(
           m.chat,
           {
@@ -109,28 +110,15 @@ const handler = async (m, { conn, text, command }) => {
         )
       }
     } else {
-      if (fileSize > MAX_VIDEO) {
-        // Mandar como documento si supera el límite
-        await conn.sendMessage(
-          m.chat,
-          {
-            document: { url: dlUrl },
-            fileName: `${title}.mp4`,
-            mimetype: "video/mp4"
-          },
-          { quoted: m }
-        )
-      } else {
-        await conn.sendMessage(
-          m.chat,
-          {
-            document: { url: dlUrl },
-            fileName: `${title}.mp4`,
-            mimetype: "video/mp4"
-          },
-          { quoted: m }
-        )
-      }
+      await conn.sendMessage(
+        m.chat,
+        {
+          document: { url: dlUrl },
+          fileName: `${title}.mp4`,
+          mimetype: "video/mp4"
+        },
+        { quoted: m }
+      )
     }
 
     user.coin = (user.coin || 0) - COST
@@ -172,4 +160,4 @@ async function getBuffer(url) {
   const res = await fetch(url)
   const buffer = await res.buffer()
   return buffer
-  }
+                                                                     }
