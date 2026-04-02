@@ -7,20 +7,23 @@ const COST = 10
 const MAX_AUDIO = 16 * 1024 * 1024  // 16MB
 const MAX_VIDEO = 64 * 1024 * 1024  // 64MB
 
+const botname = "insanity bot"
+const dev = "insanity31"
+
 const handler = async (m, { conn, text, command }) => {
   try {
     if (!text.trim()) {
-      return conn.reply(m.chat, "⚽ Ingresa el nombre o enlace del video.", m)
+      return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video." }, { quoted: m })
     }
 
     const user = global.db.data.users[m.sender]
 
     if ((user.coin || 0) < COST) {
       const faltante = COST - (user.coin || 0)
-      return conn.reply(
+      return await conn.sendMessage(
         m.chat,
-        `⚽ No tienes suficientes monedas.\n\n💎 Necesitas: *${COST}*\n💎 Tienes: *${user.coin || 0}*\n💎 Te faltan: *${faltante}*`,
-        m
+        { text: `⚽ No tienes suficientes monedas.\n\n💎 Necesitas: *${COST}*\n💎 Tienes: *${user.coin || 0}*\n💎 Te faltan: *${faltante}*` },
+        { quoted: m }
       )
     }
 
@@ -34,7 +37,7 @@ const handler = async (m, { conn, text, command }) => {
     }
 
     ytSearch = ytSearch.all?.[0] || ytSearch.videos?.[0] || ytSearch
-    if (!ytSearch) return conn.reply(m.chat, "✧ No se encontraron resultados.", m)
+    if (!ytSearch) return await conn.sendMessage(m.chat, { text: "✧ No se encontraron resultados." }, { quoted: m })
 
     const { title, thumbnail, timestamp, views, ago, url } = ytSearch
     const vistas = formatViews(views)
@@ -43,11 +46,10 @@ const handler = async (m, { conn, text, command }) => {
 
     const type = ["play", "yta", "ytmp3", "playaudio"].includes(command) ? "audio" : "video"
 
-    await conn.reply(
+    await conn.sendMessage(
       m.chat,
-      `⚽ 𝗬𝗼𝘂𝗧𝘂𝗯𝗲 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱\n> 🎬 *${title}*\n> 👁️ *${vistas}*\n> ⏱️ *${timestamp}*\n> 📅 *${ago}*\n\n⚽ Procesando archivo...`,
-      m,
       {
+        text: `⚽ 𝗬𝗼𝘂𝗧𝘂𝗯𝗲 𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱\n> 🎬 *${title}*\n> 👁️ *${vistas}*\n> ⏱️ *${timestamp}*\n> 📅 *${ago}*\n\n⚽ Procesando archivo...`,
         contextInfo: {
           externalAdReply: {
             title: botname,
@@ -59,7 +61,8 @@ const handler = async (m, { conn, text, command }) => {
             renderLargerThumbnail: true
           }
         }
-      }
+      },
+      { quoted: m }
     )
 
     const api = `https://rest.apicausas.xyz/api/v1/descargas/youtube?url=${encodeURIComponent(url)}&type=${type}&apikey=${API_KEY}`
@@ -131,13 +134,13 @@ const handler = async (m, { conn, text, command }) => {
 
     user.coin = (user.coin || 0) - COST
 
-    await conn.reply(
+    await conn.sendMessage(
       m.chat,
-      `⚽ Descarga completada.\n💎 Se descontaron *${COST}* monedas.\n💎 Cartera actual: *${user.coin}*`,
-      m
+      { text: `⚽ Descarga completada.\n💎 Se descontaron *${COST}* monedas.\n💎 Cartera actual: *${user.coin}*` },
+      { quoted: m }
     )
   } catch (e) {
-    conn.reply(m.chat, `⚠︎ Error: ${e.message}`, m)
+    await conn.sendMessage(m.chat, { text: `⚠︎ Error: ${e.message}` }, { quoted: m })
   }
 }
 
@@ -162,5 +165,10 @@ function formatViews(views) {
   if (views >= 1e6) return `${(views / 1e6).toFixed(1)}M`
   if (views >= 1e3) return `${(views / 1e3).toFixed(1)}k`
   return views.toString()
-                       }
-        
+}
+
+async function getBuffer(url) {
+  const res = await fetch(url)
+  const buffer = await res.buffer()
+  return buffer
+                           }
