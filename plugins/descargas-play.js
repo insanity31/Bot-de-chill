@@ -1,19 +1,22 @@
 import fetch from "node-fetch"
 import yts from "yt-search"
 
-const API_KEY = "Nose-xd"  // Cámbiala si tienes una key real
+const API_KEY = "Nose-xd"
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 const COST = 10
-const MAX_AUDIO = 16 * 1024 * 1024
-const MAX_VIDEO = 64 * 1024 * 1024
+const MAX_AUDIO = 16 * 1024 * 1024  // 16MB
+const MAX_VIDEO = 64 * 1024 * 1024  // 64MB
 
 const botname = "insanity bot"
 const dev = "insanity31"
 
-const handler = async (m, { conn, text, command }) => {
+const handler = async (m, { conn, command }) => {
+  // ✅ OBTENER TEXTO CORRECTAMENTE DESDE EL MENSAJE
+  const text = m.text || m.message?.conversation || m.message?.extendedTextMessage?.text || ""
+  
   try {
     if (!text || !text.trim()) {
-      return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video." }, { quoted: m })
+      return await conn.sendMessage(m.chat, { text: "⚽ Ingresa el nombre o enlace del video.\n📌 Ejemplo: .play Bad Bunny" }, { quoted: m })
     }
 
     const user = global.db.data.users[m.sender]
@@ -69,24 +72,18 @@ const handler = async (m, { conn, text, command }) => {
     const res = await fetch(api)
     const json = await res.json()
 
-    // 🔍 DEPURACIÓN: Muestra la respuesta completa en consola
-    console.log("📦 Respuesta de la API:", JSON.stringify(json, null, 2))
-
-    // ✅ Intenta extraer la URL de descarga de varias estructuras comunes
+    // Intenta extraer la URL de descarga de diferentes formatos
     let dlUrl = null
     if (json.data?.download?.url) dlUrl = json.data.download.url
     else if (json.data?.url) dlUrl = json.data.url
     else if (json.result?.url) dlUrl = json.result.url
     else if (json.download?.url) dlUrl = json.download.url
     else if (json.url) dlUrl = json.url
-    else if (json.link) dlUrl = json.link
-    else if (json.dl_url) dlUrl = json.dl_url
 
     if (!dlUrl) {
-      throw new Error(`No se encontró URL de descarga. Respuesta: ${JSON.stringify(json)}`)
+      throw new Error("La API no devolvió una URL válida")
     }
 
-    // Verificar tamaño
     let fileSize = 0
     try {
       const headRes = await fetch(dlUrl, { method: 'HEAD' })
@@ -136,7 +133,7 @@ const handler = async (m, { conn, text, command }) => {
       { quoted: m }
     )
   } catch (e) {
-    console.error("❌ Error:", e)
+    console.error(e)
     await conn.sendMessage(m.chat, { text: `⚠︎ Error: ${e.message}` }, { quoted: m })
   }
 }
@@ -167,4 +164,4 @@ function formatViews(views) {
 async function getBuffer(url) {
   const res = await fetch(url)
   return res.buffer()
-}
+        }
