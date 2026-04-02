@@ -1,7 +1,7 @@
 import fetch from "node-fetch"
 import yts from "yt-search"
 
-const API_KEY = "Zyzz-1234"
+const API_KEY = "Nose-xd"
 const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/
 const COST = 10
 const MAX_AUDIO = 16 * 1024 * 1024  // 16MB
