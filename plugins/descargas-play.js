@@ -160,4 +160,4 @@ async function getBuffer(url) {
   const res = await fetch(url)
   const buffer = await res.buffer()
   return buffer
-                                                                     }
+        }
