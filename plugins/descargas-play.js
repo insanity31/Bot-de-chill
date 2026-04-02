@@ -10,9 +10,7 @@ const MAX_VIDEO = 64 * 1024 * 1024
 const botname = "insanity bot"
 const dev = "insanity31"
 
-// ✅ CORREGIDO - text se extrae de m, no viene como parámetro
 const handler = async (m, { conn, command }) => {
-  // Obtener el texto del mensaje correctamente
   const text = m.text || m.message?.conversation || m.message?.extendedTextMessage?.text || ""
   
   try {
@@ -74,8 +72,18 @@ const handler = async (m, { conn, command }) => {
     const res = await fetch(api)
     const json = await res.json()
 
-    if (!json?.status || !json?.data?.download?.url) {
-      throw new Error("No se pudo descargar el archivo")
+    // ✅ VALIDACIONES MEJORADAS
+    if (!json) {
+      throw new Error("La API no respondió")
+    }
+
+    if (!json.status) {
+      throw new Error(`API: ${json.message || "Error desconocido"}`)
+    }
+
+    if (!json.data || !json.data.download || !json.data.download.url) {
+      console.log("Respuesta API:", JSON.stringify(json, null, 2))
+      throw new Error("La API no devolvió la URL de descarga")
     }
 
     const dlUrl = json.data.download.url
@@ -129,6 +137,7 @@ const handler = async (m, { conn, command }) => {
       { quoted: m }
     )
   } catch (e) {
+    console.error("Error:", e)
     await conn.sendMessage(m.chat, { text: `⚠︎ Error: ${e.message}` }, { quoted: m })
   }
 }
@@ -160,4 +169,4 @@ async function getBuffer(url) {
   const res = await fetch(url)
   const buffer = await res.buffer()
   return buffer
-        }
+         }
