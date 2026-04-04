@@ -7,7 +7,8 @@ const scriptPath = fileURLToPath(import.meta.url);
 
 global.owner = [
     ['584244733684', ' insanity31'],
-    ['573135180876', 'duartexv']
+    ['573135180876', 'duartexv'],
+    ['5493873655135', 'fargust la cabra']
 ];
 global.mods = [];
 global.suittag = [];
