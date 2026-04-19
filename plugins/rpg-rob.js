@@ -69,9 +69,19 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         coins[userId].balance += cantidadRobada
         coins[targetId].balance -= cantidadRobada
         saveCoins()
+        
         respuesta = `🔥 *¡ROBO EXITOSO !* 🔥\n\n`+
             `Víctima: @${targetId.split('@')[0]}\n` +
-            `probanilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
+            `probanilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
+            `¡Escapaste con el dinero eres la fokin cabra\🐐\n` +
+            `Tu nuevo saldo: ${coins[userId].balance} ${moneda} 💰\n` +
+            `saldo de la víctima: ${coins[targetId].balance ${moneda}`
+        await m.react ('💵')
+    } else {
+                          
+        respuesta = `🔥 *¡ROBO EXITOSO !* 🔥\n\n`+
+            `Víctima: @${targetId.split('@')[0]}\n` +
+            `probanilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
             `¡Escapaste con el dinero eres la fokin cabra\🐐\n` +
             `Tu nuevo saldo: ${coins[userId].balance} ${moneda} 💰\n` +
             `saldo de la víctima: ${coins[targetId].balance ${moneda}`
@@ -81,7 +91,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                     respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `Cantidad robada: +${cantidadRobada} ${moneda} 💰\n` +
-                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
                    `¡Escapaste con el dinero! ¡Eres tan malo\~ 💕\n` +
                    `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
                    `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
@@ -100,7 +110,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `¡Te atraparon! Tuviste que darle dinero como compensación 😭\n` +
                    `Dinero perdido: -${cantidadRobada} ${moneda} 💔\n` +
-                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
                    `¡La próxima vez ten cuidado tonto! insanity estaria decepcionado de ti 😐\n` +
                    `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
                    `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
