@@ -54,7 +54,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 
     // Probabilidad de éxito: 60%
-    const probabilidadExito = 50%
+    const probabilidadExito = 10%
     const exito = Math.random() < probabilidadExito
 
     let cantidadRobada = random
