@@ -27,17 +27,17 @@ let handler = async (m) => {
 
     if (Date.now() - (coins[userId].lastRpgChamba || 0) < 900000) {
         const tiempo = Math.ceil((900000 - (Date.now() - coins[userId].lastRpgChamba)) / 60000)
-        return m.reply(`💔 Ya hiciste tu quest RPG hoy darling\~\nVuelve en *${tiempo} minutos* no me dejes sola\~`)
+        return m.reply(` Ya hiciste tu quest RPG hoy\~\nVuelve en *${tiempo} minutos* no me dejes sola\~`)
     }
 
-    const ganancia = 180
+    const ganancia = 180, 200
     coins[userId].balance += ganancia
     coins[userId].lastRpgChamba = Date.now()
     saveCoins()
 
-    const trollText = `💗 *¡QUEST RPG-CHAMBA COMPLETADA DARLING!* 🌸\n\n` +
-                     `Entraste a la mazmorra a matar slimes... pero terminaste chupándosela al Slime Rey durante 3 horas seguidas y te dio *${ganancia} ${moneda}* como recompensa 😂\n\n` +
-                     `¡Zero Two aprueba esta quest troll! 💕\n` +
+    const trollText = `🔥 *¡felicidades ganaste 🗣️!* 🗿\n\n` +
+                     `ibas a un estacionamiento y te topaste a una persona rara, te dio un paquete y te dijo que lo lleves a otro barrio y se lo des a alguien específico*${ganancia} ${moneda}* como recompensa 😂\n\n` +
+                     `¡insanity aprueba esta mision segundaria! \n` +
                      `Saldo actual: ${coins[userId].balance} ${moneda}`
 
     return m.reply(trollText)
