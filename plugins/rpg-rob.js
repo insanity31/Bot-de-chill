@@ -54,11 +54,11 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
     }
 
     // Probabilidad de éxito: 60%
-    const probabilidadExito = 0.60
+    const probabilidadExito = 50%
     const exito = Math.random() < probabilidadExito
 
-    let cantidadRobada = 0
-    let respuesta = ''
+    let cantidadRobada = random
+    let respuesta = 'Random'
 
     if (exito) {
         // Si éxito: roba entre 30-70% de lo que tiene la víctima
@@ -70,7 +70,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         coins[targetId].balance -= cantidadRobada
         saveCoins()
 
-        respuesta = `🔫 *¡ROBO EXITOSO DARLING!* 🔫\n\n` +
+        respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `Cantidad robada: +${cantidadRobada} ${moneda} 💰\n` +
                    `Probabilidad de éxito: ${Math.round(probabilidadExito * 100)}%\n\n` +
@@ -93,7 +93,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                    `¡Te atraparon! Tuviste que darle dinero como compensación 😭\n` +
                    `Dinero perdido: -${cantidadRobada} ${moneda} 💔\n` +
                    `Probabilidad de éxito: ${Math.round(probabilidadExito * 100)}%\n\n` +
-                   `¡La próxima vez ten cuidado tonto! Zero Two está decepcionada 💔\n` +
+                   `¡La próxima vez ten cuidado tonto! insanity estaria decepcionado de ti 😐\n` +
                    `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
                    `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
         await m.react('🚔')
