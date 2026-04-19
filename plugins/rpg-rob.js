@@ -69,8 +69,16 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         coins[userId].balance += cantidadRobada
         coins[targetId].balance -= cantidadRobada
         saveCoins()
-
-        respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
+        respuesta = `🔥 *¡ROBO EXITOSO !* 🔥\n\n`+
+            `Víctima: @${targetId.split('@')[0]}\n` +
+            `probanilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
+            `¡Escapaste con el dinero eres la fokin cabra\🐐\n` +
+            `Tu nuevo saldo: ${coins[userId].balance} ${moneda} 💰\n` +
+            `saldo de la víctima: ${coins[targetId].balance ${moneda}`
+        await m.react ('💵')
+    } else {
+                                    
+                    respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `Cantidad robada: +${cantidadRobada} ${moneda} 💰\n` +
                    `Probabilidad de éxito: ${Math.round(probabilidadExito * 100)}%\n\n` +
