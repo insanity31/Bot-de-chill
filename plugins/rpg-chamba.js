@@ -30,7 +30,7 @@ let handler = async (m) => {
         return m.reply(` Ya hiciste tu quest RPG hoy\~\nVuelve en *${tiempo} minutos* no me dejes sola\~`)
     }
 
-    const ganancia = 180, 200
+    const ganancia = 180
     coins[userId].balance += ganancia
     coins[userId].lastRpgChamba = Date.now()
     saveCoins()
