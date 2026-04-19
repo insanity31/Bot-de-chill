@@ -31,6 +31,7 @@ let handler = async (m) => {
     }
 
     const ganancia = 180
+    const ganancia = 200
     coins[userId].balance += ganancia
     coins[userId].lastRpgChamba = Date.now()
     saveCoins()
