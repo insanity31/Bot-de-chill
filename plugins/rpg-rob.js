@@ -81,7 +81,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                     respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `Cantidad robada: +${cantidadRobada} ${moneda} 💰\n` +
-                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 100)}%\n\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
                    `¡Escapaste con el dinero! ¡Eres tan malo\~ 💕\n` +
                    `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
                    `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
@@ -100,7 +100,7 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                    `Víctima: @${targetId.split('@')[0]}\n` +
                    `¡Te atraparon! Tuviste que darle dinero como compensación 😭\n` +
                    `Dinero perdido: -${cantidadRobada} ${moneda} 💔\n` +
-                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 100)}%\n\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 50)}%\n\n` +
                    `¡La próxima vez ten cuidado tonto! insanity estaria decepcionado de ti 😐\n` +
                    `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
                    `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
