@@ -5,11 +5,11 @@ let handler = async (m, { conn }) => {
     let mime = (q.msg || q).mimetype || q.mimetype || ''
 
     if (!mime || !/webp/.test(mime)) {
-        await m.react('🌸')
-        return m.reply('💗 *Responde a un sticker* darling\~ para convertirlo en foto normal\n\nEjemplo: responde al sticker y escribe #toimg')
+        await m.react('🔥')
+        return m.reply('🐢 *Responde a un sticker* puñeta\~ para convertirlo en foto normal\n\nEjemplo: responde al sticker y escribe #toimg')
     }
 
-    await m.react('🍬')
+    await m.react('🗿')
 
     try {
         let media = await downloadMediaMessage(q, 'buffer', {}, {
@@ -18,15 +18,15 @@ let handler = async (m, { conn }) => {
 
         await conn.sendMessage(m.chat, {
             image: media,
-            caption: '💗 ¡Aquí tienes tu imagen darling!\nConvertido con todo mi amor de Zero Two 🌸'
+            caption: '🗣️ ¡Aquí tienes tu imagen \nConvertido con to mi fokin power'
         }, { quoted: m })
 
-        await m.react('💗')
+        await m.react('🔥')
 
     } catch (e) {
         console.error('❌ TOIMG ERROR:', e)
-        await m.react('💔')
-        m.reply('💔 Uy darling... este sticker se resistió un poquito\~\nPrueba con otro no me dejes sola 🌸')
+        await m.react('😐')
+        m.reply('😐 Uy we... este sticker se resistió un poquito\~\nPrueba con otro')
     }
 }
 
