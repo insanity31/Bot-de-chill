@@ -78,6 +78,28 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             `saldo de la víctima: ${coins[targetId].balance ${moneda}`
         await m.react ('💵')
     } else {
+        // Si fallo: pierdes entre 20-50% de lo que tienes
+        const porcentaje = Math.floor(Math.random() * 30) + 20 // 20-50%
+        cantidadRobada = Math.floor(yourBalance * (porcentaje / 100))
+        cantidadRobada = Math.max(10, Math.min(cantidadRobada, yourBalance))
+
+        coins[userId].balance -= cantidadRobada
+        coins[targetId].balance += cantidadRobada
+        saveCoins()
+
+        respuesta = `🚔 *¡ROBO FALLIDO DARLING!* 🚔\n\n` +
+                   `Víctima: @${targetId.split('@')[0]}\n` +
+                   `¡Te atraparon! Tuviste que darle dinero como compensación 😭\n` +
+                   `Dinero perdido: -${cantidadRobada} ${moneda} 💔\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
+                   `¡La próxima vez ten cuidado tonto! insanity estaria decepcionado de ti 😐\n` +
+                   `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
+                   `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
+        await m.react('🚔')
+    }
+
+    return m.reply(respuesta, { mentions: [userId, targetId] })
+            }
                           
         respuesta = `🔥 *¡ROBO EXITOSO !* 🔥\n\n`+
             `Víctima: @${targetId.split('@')[0]}\n` +
@@ -87,6 +109,28 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
             `saldo de la víctima: ${coins[targetId].balance ${moneda}`
         await m.react ('💵')
     } else {
+        // Si fallo: pierdes entre 20-50% de lo que tienes
+        const porcentaje = Math.floor(Math.random() * 30) + 20 // 20-50%
+        cantidadRobada = Math.floor(yourBalance * (porcentaje / 100))
+        cantidadRobada = Math.max(10, Math.min(cantidadRobada, yourBalance))
+
+        coins[userId].balance -= cantidadRobada
+        coins[targetId].balance += cantidadRobada
+        saveCoins()
+
+        respuesta = `🚔 *¡ROBO FALLIDO DARLING!* 🚔\n\n` +
+                   `Víctima: @${targetId.split('@')[0]}\n` +
+                   `¡Te atraparon! Tuviste que darle dinero como compensación 😭\n` +
+                   `Dinero perdido: -${cantidadRobada} ${moneda} 💔\n` +
+                   `Probabilidad de éxito: ${Math.round(probabilidadExito * 25)}%\n\n` +
+                   `¡La próxima vez ten cuidado tonto! insanity estaria decepcionado de ti 😐\n` +
+                   `Tu nuevo saldo: ${coins[userId].balance} ${moneda}\n` +
+                   `Saldo de la víctima: ${coins[targetId].balance} ${moneda}`
+        await m.react('🚔')
+    }
+
+    return m.reply(respuesta, { mentions: [userId, targetId] })
+            }
                                     
                     respuesta = `🔫 *¡ROBO EXITOSO !* 🔫\n\n` +
                    `Víctima: @${targetId.split('@')[0]}\n` +
