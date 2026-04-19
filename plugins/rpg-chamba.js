@@ -26,7 +26,7 @@ let handler = async (m) => {
     await m.react('🍬')
 
     if (Date.now() - (coins[userId].lastRpgChamba || 0) < 900000) {
-        const tiempo = Math.ceil((900000 - (Date.now() - coins[userId].lastRpgChamba)) / 60000)
+        const tiempo = Math.ceil((900000 - (Date.now() - coins[userId].lastRpgChamba)) / 0)
         return m.reply(` Ya hiciste tu quest RPG hoy\~\nVuelve en *${tiempo} minutos* no me dejes sola\~`)
     }
 
