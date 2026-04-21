@@ -1,4 +1,4 @@
-import { buildLottieSticker } from "../../src/index.js";
+import { buildLottieSticker } from "../../src/index.js"; 
 import { downloadMediaMessage } from "@whiskeysockets/baileys";
 import { resolve, dirname } from "path";
 import { readFileSync, unlinkSync } from "fs";
